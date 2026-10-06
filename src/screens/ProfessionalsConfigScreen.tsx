@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MedicalProfessional } from '../types';
 import { FunctionalCareLogo } from '../components/FunctionalCareLogo';
+import { generateClinicalUsername } from '../utils/authUtils';
 
 interface ProfessionalsConfigScreenProps {
   professionals: MedicalProfessional[];
@@ -432,9 +433,17 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                   <input
                     type="text"
                     required
-                    placeholder="Ej. Dr. Mauricio Thorne, MD, IFMCP"
+                    placeholder="Ej. Dr. Mauricio Suaza Gutiérrez, MD"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      setFullName(newName);
+                      // Auto-generar username según regla si es nuevo o no personalizado
+                      if (!editingId || !username || username.startsWith('dr_')) {
+                        const autoUser = generateClinicalUsername(newName);
+                        if (autoUser) setUsername(autoUser);
+                      }
+                    }}
                     className="w-full px-3 py-2 text-xs rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-[#fff8f5]"
                   />
                 </div>
@@ -522,9 +531,28 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-[#1e1b19] mb-1">
-                      Usuario / Login *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] font-bold text-[#1e1b19]">
+                        Usuario / Login *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const auto = generateClinicalUsername(fullName);
+                          if (auto) {
+                            setUsername(auto);
+                            onShowToast(`Usuario generado: @${auto} (Regla 3+2+2)`);
+                          } else {
+                            onShowToast('Ingrese primero el nombre completo para aplicar la regla.');
+                          }
+                        }}
+                        className="text-[10px] text-[#005c55] hover:text-[#004742] font-semibold flex items-center gap-0.5 cursor-pointer"
+                        title="Aplicar regla: 3 letras nombre + 2 letras 1er apellido + 2 letras 2do apellido"
+                      >
+                        <span className="material-symbols-outlined text-[12px]">auto_fix_high</span>
+                        <span>Auto (3+2+2)</span>
+                      </button>
+                    </div>
                     <div className="relative">
                       <input
                         type="text"
@@ -576,9 +604,12 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                   </div>
                 </div>
 
-                <p className="text-[10.5px] text-[#6e7977]">
-                  Estas credenciales permiten al profesional identificarse en la pantalla de inicio de sesión clínica y firmar digitalmente expedientes.
-                </p>
+                <div className="flex items-center gap-2 p-2 bg-[#005c55]/5 border border-[#005c55]/15 rounded-lg text-[11px] text-[#005c55]">
+                  <span className="material-symbols-outlined text-base shrink-0">rule</span>
+                  <span>
+                    <strong>Regla de Usuario (3+2+2):</strong> Se construye automáticamente con las <strong>3 primeras letras del nombre</strong> + las <strong>2 primeras del 1er apellido</strong> + las <strong>2 primeras del 2do apellido</strong> (ej. <em>Mauricio Suaza Gutiérrez → mausugu</em>).
+                  </span>
+                </div>
               </div>
 
               {/* Digital Signature Section */}

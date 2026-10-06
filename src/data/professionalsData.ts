@@ -8,7 +8,7 @@ const DEFAULT_SIGNATURE_DRA_RESTREPO = `data:image/svg+xml;utf8,<svg xmlns="http
 export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
   {
     id: 'doc-1',
-    fullName: 'Dr. Mauricio Suaza Thorne, MD, IFMCP',
+    fullName: 'Dr. Mauricio Suaza Gutiérrez, MD, IFMCP',
     title: 'Director Médico Especialista en Medicina Funcional y Regenerativa',
     specialty: 'Endocrinología Metabólica & Medicina de Precisión',
     licenseNumber: 'TP-84920-MD',
@@ -24,7 +24,7 @@ export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
   },
   {
     id: 'doc-2',
-    fullName: 'Dra. Sofía Elena Restrepo, MD, MSc',
+    fullName: 'Dra. Sofía Elena Restrepo Gómez, MD, MSc',
     title: 'Especialista en Nutrición Clínica Funcional e Inmunonutrición',
     specialty: 'Gastroenterología Funcional & Microbiota',
     licenseNumber: 'TP-91340-MD',
@@ -34,7 +34,7 @@ export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
     signatureUrl: DEFAULT_SIGNATURE_DRA_RESTREPO,
     isPrimary: false,
     registeredAt: '2024-06-20',
-    username: 'srestrepo',
+    username: 'sofrego',
     password: 'M77',
     role: 'doctor',
   },

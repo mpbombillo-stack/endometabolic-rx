@@ -93,12 +93,13 @@ CREATE INDEX IF NOT EXISTS idx_patients_mrn ON public.patients(mrn);
 CREATE INDEX IF NOT EXISTS idx_evolutions_patient_id ON public.patient_evolutions(patient_id);
 CREATE INDEX IF NOT EXISTS idx_evolutions_date ON public.patient_evolutions(date DESC);
 
--- 8. DATOS SEMILLA INICIALES (PROFESIONALES Y SUPER USUARIO)
+-- 8. DATOS SEMILLA INICIALES (PROFESIONALES Y SUPER USUARIO CON REGLA 3+2+2)
 INSERT INTO public.medical_professionals (id, full_name, title, specialty, license_number, institution, email, phone, is_primary, username, password, role)
 VALUES 
-  ('doc-1', 'Dr. Mauricio Suaza Thorne, MD, IFMCP', 'Director Médico Especialista en Medicina Funcional y Regenerativa', 'Endocrinología Metabólica & Medicina de Precisión', 'TP-84920-MD', 'Functional Care Institute & Metabolic Center', 'm.suaza@functionalcare.med', '+57 (315) 890-4421', true, 'mausugu', 'M77', 'superadmin'),
-  ('doc-2', 'Dra. Sofía Restrepo, MD, MSc', 'Especialista en Nutrición Clínica & Medicina Integrativa', 'Gastroenterología Funcional & Microbiota', 'TP-91340-MD', 'Functional Care Institute', 's.restrepo@functionalcare.med', '+57 (318) 722-9014', false, 'srestrepo', 'M77', 'doctor')
+  ('doc-1', 'Dr. Mauricio Suaza Gutiérrez, MD, IFMCP', 'Director Médico Especialista en Medicina Funcional y Regenerativa', 'Endocrinología Metabólica & Medicina de Precisión', 'TP-84920-MD', 'Functional Care Institute & Metabolic Center', 'm.suaza@functionalcare.med', '+57 (315) 890-4421', true, 'mausugu', 'M77', 'superadmin'),
+  ('doc-2', 'Dra. Sofía Elena Restrepo Gómez, MD, MSc', 'Especialista en Nutrición Clínica Funcional e Inmunonutrición', 'Gastroenterología Funcional & Microbiota', 'TP-91340-MD', 'Functional Care Institute', 'srestrepo@functionalcare.com', '+57 (318) 722-9014', false, 'sofrego', 'M77', 'doctor')
 ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
   username = EXCLUDED.username,
   password = EXCLUDED.password,
   role = EXCLUDED.role;

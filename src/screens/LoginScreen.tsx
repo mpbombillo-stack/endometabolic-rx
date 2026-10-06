@@ -212,7 +212,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
 
             <p className="text-[10px] text-[#8a9694] text-center mt-3 flex items-center justify-center gap-1">
               <span className="material-symbols-outlined text-[12px]">security</span>
-              <span>Parametrizable desde el módulo de Configuración del Equipo Médico.</span>
+              <span>Regla (3+2+2): 3 letras nombre + 2 letras 1er apellido + 2 letras 2do apellido (ej. mausugu).</span>
             </p>
           </div>
         </div>
