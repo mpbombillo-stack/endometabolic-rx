@@ -1,4 +1,4 @@
-# MANUAL DE USUARIO & GLOSARIO CLÍNICO DE ACRÓNIMOS
+# MANUAL DE USUARIO & GUÍA CLÍNICA METODOLÓGICA
 ## Sistema de Soporte a Decisiones Clínicas en Medicina Funcional y Endocrinología Metabólica
 **EndoMetabolic Rx • Functional Care (Medicina Funcional & Regenerativa)**  
 *Versión de la Plataforma: 4.2.0-Production (2026)*
@@ -8,253 +8,275 @@
 ## TABLA DE CONTENIDO
 1. [Introducción y Arquitectura Clínica](#1-introducción-y-arquitectura-clínica)
 2. [Control de Acceso, Autenticación y Seguridad](#2-control-de-acceso-autenticación-y-seguridad)
-3. [Módulo 1: Expediente del Paciente & Dashboard de Cohorte](#3-módulo-1-expediente-del-paciente--dashboard-de-cohorte)
-4. [Módulo 2: Marco Fisiopatológico ATM & Matriz de los 7 Nodos](#4-módulo-2-marco-fisiopatológico-atm--matriz-de-los-7-nodos)
-5. [Módulo 3: Calculadora de Índices Subrogados de Resistencia a la Insulina](#5-módulo-3-calculadora-de-índices-subrogados-de-resistencia-a-la-insulina)
-6. [Módulo 4: Análisis de Curvas de Sobrecarga Oral a la Glucosa (Kraft OGTT)](#6-módulo-4-análisis-de-curvas-de-sobrecarga-oral-a-la-glucosa-kraft-ogtt)
-7. [Módulo 5: CDSS, Atribución SHAP & Estratificación de Riesgo](#7-módulo-5-cdss-atribución-shap--estratificación-de-riesgo)
-8. [Módulo 6: Matriz Terapéutica & Protocolos Funcionales](#8-módulo-6-matriz-terapéutica--protocolos-funcionales)
-9. [Módulo 7: Monitoreo Continuo (CGM) & Ecosistema Interoperable HL7 FHIR R4](#9-módulo-7-monitoreo-continuo-cgm--ecosistema-interoperable-hl7-fhir-r4)
-10. [Módulo 8: Configuración del Equipo Médico, Firmas Digitales y Exportación PDF](#10-módulo-8-configuración-del-equipo-médico-firmas-digitales-y-exportación-pdf)
-11. [Glosario Oficial de Acrónimos y Abreviaturas](#11-glosario-oficial-de-acrónimos-y-abreviaturas)
+3. [Secuencia Clínica en el Ingreso de Datos (Paso a Paso)](#3-secuencia-clínica-en-el-ingreso-de-datos-paso-a-paso)
+4. [Diccionario Clínico de Ítems: ¿Qué hace cada campo y para qué sirve?](#4-diccionario-clínico-de-ítems-qué-hace-cada-campo-y-para-qué-sirve)
+5. [Metodología y Protocolo de Seguimiento Longitudinal](#5-metodología-y-protocolo-de-seguimiento-longitudinal)
+6. [Módulo 1: Expediente del Paciente & Dashboard de Cohorte](#6-módulo-1-expediente-del-paciente--dashboard-de-cohorte)
+7. [Módulo 2: Marco Fisiopatológico ATM & Matriz de los 7 Nodos](#7-módulo-2-marco-fisiopatológico-atm--matriz-de-los-7-nodos)
+8. [Módulo 3: Calculadora de Índices Subrogados de Resistencia a la Insulina](#8-módulo-3-calculadora-de-índices-subrogados-de-resistencia-a-la-insulina)
+9. [Módulo 4: Análisis de Curvas de Sobrecarga Oral a la Glucosa (Kraft OGTT)](#9-módulo-4-análisis-de-curvas-de-sobrecarga-oral-a-la-glucosa-kraft-ogtt)
+10. [Módulo 5: CDSS, Atribución SHAP & Estratificación de Riesgo](#10-módulo-5-cdss-atribución-shap--estratificación-de-riesgo)
+11. [Módulo 6: Matriz Terapéutica & Protocolos Funcionales](#11-módulo-6-matriz-terapéutica--protocolos-funcionales)
+12. [Módulo 7: Monitoreo Continuo (CGM) & Ecosistema Interoperable HL7 FHIR R4](#12-módulo-7-monitoreo-continuo-cgm--ecosistema-interoperable-hl7-fhir-r4)
+13. [Módulo 8: Configuración del Equipo Médico, Firmas Digitales y Exportación PDF](#13-módulo-8-configuración-del-equipo-médico-firmas-digitales-y-exportación-pdf)
+14. [Glosario Oficial de Acrónimos y Abreviaturas](#14-glosario-oficial-de-acrónimos-y-abreviaturas)
 
 ---
 
 ## 1. INTRODUCCIÓN Y ARQUITECTURA CLÍNICA
 
-**EndoMetabolic Rx** es una plataforma clínica de vanguardia diseñada para especialistas en Medicina Funcional, Endocrinología Metabólica y Medicina Regenerativa. Integra modelos predictivos de Machine Learning (XGBoost SHAP), calculadoras de índices subrogados de sensibilidad a la insulina, análisis dinámico de curvas Kraft OGTT y conectividad con estándares internacionales de salud **HL7 FHIR R4**.
-
-### Objetivos Clínicos del Sistema:
-- **Detección Precoz:** Identificar fenotipos hiperinsulinémicos y resistencia a la insulina oculta antes de la elevación de la glucemia basal o la HbA1c.
-- **Abordaje de Causa Raíz:** Mapear la interconexión fisiopatológica del paciente mediante la matriz ATM (Antecedentes, Gatilladores, Mediadores) y los 7 sistemas biológicos.
-- **Personalización Terapéutica:** Diseñar intervenciones funcionales basadas en crononutrición, restauración de barrera intestinal (5R), ejercicio en Zona 2 mitocondrial y nutracéuticos de precisión.
-- **Seguridad e Interoperabilidad:** Garantizar la trazabilidad de datos médicos y firma digitalizada bajo estándares HIPAA y FHIR R4.
+**EndoMetabolic Rx** es una plataforma clínica de alta precisión desarrollada para especialistas en Medicina Funcional, Endocrinología Metabólica y Medicina Regenerativa. Su propósito principal es identificar de forma temprana los estados de hiperinsulinemia compensatoria, resistencia a la insulina oculta, disfunción mitocondrial e inflamación metabólica antes de que se manifiesten en la glucemia basal o la hemoglobina glicosilada (HbA1c).
 
 ---
 
 ## 2. CONTROL DE ACCESO, AUTENTICACIÓN Y SEGURIDAD
 
-### 2.1. Regla de Construcción Automática del Usuario Clínico (3 + 2 + 2)
-El sistema genera el identificador de acceso (*login*) de manera automática a partir del nombre completo del especialista:
+### 2.1. Regla Institucional de Construcción de Usuario (3 + 2 + 2)
+El nombre de usuario (*login*) se genera automáticamente a partir del nombre completo del especialista:
 
-$$\text{Usuario} = \text{3 primeras letras del Nombre} + \text{2 primeras letras del 1er Apellido} + \text{2 primeras letras del 2do Apellido}$$
+$$\text{Usuario} = \underbrace{\text{3 primeras letras}}_{\text{Nombre de Pila}} + \underbrace{\text{2 primeras letras}}_{\text{1er Apellido}} + \underbrace{\text{2 primeras letras}}_{\text{2do Apellido}}$$
 
-*Ejemplos:*
-- **Dr. Mauricio Suaza Gutiérrez** $\rightarrow$ `mau` + `su` + `gu` = **`mausugu`**
-- **Dra. Sofía Elena Restrepo Gómez** $\rightarrow$ `sof` + `re` + `go` = **`sofrego`**
+*Ejemplo:* **Dr. Mauricio Suaza Gutiérrez** $\rightarrow$ `mau` + `su` + `gu` = **`mausugu`**.
 
 ### 2.2. Política de Seguridad y Cambio Obligatorio de Contraseña
-Al iniciar sesión por primera vez con la clave temporal institucional (`M77`), el sistema intercepta la sesión exigiendo el cambio inmediato.
-
-**Requisitos Mandatorios:**
-1. **Longitud:** Mínimo 8 caracteres.
-2. **Números:** Al menos un dígito (`0-9`).
-3. **Mayúsculas:** Al menos una letra mayúscula (`A-Z`).
-4. **Carácter Especial:** Al menos un símbolo (`&%$#"!&/()=?`, `@`, `*`, `_`, `-`, `.`).
-5. **Confirmación:** Repetición exacta de la nueva contraseña.
-
-### 2.3. Controles de Sesión
-- **Botón "Cerrar Sesión":** Disponible en la esquina superior derecha de la barra principal y en el panel lateral.
-- **Botón "Clave":** Permite al especialista actualizar su contraseña personal en cualquier momento.
+Al autenticarse por primera vez con la clave temporal (`M77`), el sistema exige de forma obligatoria el cambio de contraseña:
+- **Longitud mínima:** 8 caracteres.
+- **Componentes:** Al menos un número (`0-9`), una letra mayúscula (`A-Z`) y un carácter especial (`&%$#"!&/()=?`, `@`, `*`, `_`, `-`, `.`).
+- **Confirmación:** Validación de repetición exacta.
 
 ---
 
-## 3. MÓDULO 1: EXPEDIENTE DEL PACIENTE & DASHBOARD DE COHORTE
+## 3. SECUENCIA CLÍNICA EN EL INGRESO DE DATOS (PASO A PASO)
 
-El módulo **Pacientes & Dashboard** permite la gestión integral de la cohorte clínica:
+Para garantizar la máxima exactitud en los cálculos subrogados, la estratificación CDSS y la generación de reportes certificados, el especialista debe seguir la siguiente secuencia cronológica de trabajo:
 
-- **Búsqueda y Filtro:** Filtrado instantáneo por Nombre, Número de Historia Clínica (MRN), Estrato Metabólico o Médico Asignado.
-- **Registro de Paciente (+ Nuevo Paciente):** Captura de datos demográficos, antecedentes personales/familiares, diagnóstico principal y protocolo en curso.
-- **Evoluciones Clínicas Longitudinales (+ Nueva Evolución):** Registro de controles periódicos con signos vitales, horas de ayuno, analítica de laboratorio y recálculo automático de estratos.
-- **Exportación de Informe Clínico Certificado (PDF):** Generación de reportes ejecutivos en PDF de alta fidelidad con membrete institucional, gráficos y firma digital del especialista.
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 1: Autenticación del Especialista (Login & Selección de Firma)     │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 2: Admisión / Intake del Paciente (+ Nuevo Paciente)               │
+│ - Datos demográficos, MRN, antecedentes, gatilladores y mediadores ATM  │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 3: Registro de Consulta y Analítica (+ Nueva Evolución)            │
+│ - Signos vitales, horas de ayuno exactas y analítica de laboratorio     │
+│ - Puntos de la curva Kraft OGTT (0', 30', 60', 120', 180' min)          │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 4: Mapeo en la Matriz Funcional (7 Nodos Biológicos)               │
+│ - Inspección de Asimilación, Defensa, Energía, Biotransformación, etc.  │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 5: Evaluación CDSS & Estratificación Predictiva (XGBoost SHAP)     │
+│ - Asignación de Estrato Metabólico (0 a 3) y visualización de factores │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 6: Prescripción del Protocolo Terapéutico (5R, Nutracéuticos, Z2)  │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ PASO 7: Telemetría CGM 24h & Exportación de Informe Certificado (PDF)   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Detalle de cada paso:
+
+1. **Paso 1 - Autenticación y Perfil Activo:** Ingrese con sus credenciales institucionales. El sistema cargará automáticamente su nombre, registro médico y firma digitalizada activa para todos los informes.
+2. **Paso 2 - Registro de Nuevo Paciente (+ Nuevo Paciente):**
+   - Ingrese nombre completo, documento / MRN (Número de Registro Médico), edad, sexo biológico, ocupación y contacto.
+   - Diligencie la anamnesis funcional: **Antecedentes (A)** predisponentes, **Gatilladores (T)** detonantes y **Mediadores (M)** de cronicidad.
+3. **Paso 3 - Registro de la Consulta / Evolución (+ Nueva Evolución):**
+   - Ingrese los signos vitales actuales (Presión Arterial, Frecuencia Cardíaca, Peso, Talla, Cintura).
+   - Ingrese las **Horas de Ayuno Exactas** (fundamental para normalizar la glucosa e insulina basal).
+   - Introduzca los valores del laboratorio sanguíneo y, si dispone de la prueba, los 5 puntos de la curva Kraft OGTT.
+4. **Paso 4 - Análisis de Índices y Matriz:** Navegue a la pestaña *Calculadora de Índices* y *Curvas Kraft* para visualizar el patrón de secreción insulínica (Patrones I al V) y los índices de fricción metabólica.
+5. **Paso 5 - Estratificación CDSS:** Acceda a la pestaña *CDSS & Estratificación* para ver la atribución de riesgo mediante SHAP y el estrato asignado (Estrato 0 a 3).
+6. **Paso 6 - Plan Terapéutico:** En *Matriz Terapéutica*, seleccione y aplique los protocolos correspondientes (Protocolo 5R digestivo, ejercicio en Zona 2, nutracéuticos de modulación de AMPK y GLP-1).
+7. **Paso 7 - Exportación y Entrega:** Genere el reporte médico en PDF de alta resolución con firma digital o el recurso HL7 FHIR R4 para el expediente electrónico hospitalario.
 
 ---
 
-## 4. MÓDULO 2: MARCO FISIOPATOLÓGICO ATM & MATRIZ DE LOS 7 NODOS
+## 4. DICCIONARIO CLÍNICO DE ÍTEMS: ¿QUÉ HACE CADA CAMPO Y PARA QUÉ SIRVE?
 
-Estructura el caso clínico bajo el estándar del *Institute for Functional Medicine (IFM)*:
+A continuación se detalla el significado fisiopatológico, la utilidad diagnóstica y el rango funcional de cada campo que se ingresa en el sistema:
 
-### 4.1. Tríada ATM
-- **Antecedentes (A):** Factores genéticos, perinatales, familiares y exposoma temprano predisponente.
-- **Gatilladores / Triggers (T):** Eventos detonantes que activan la disfunción (infecciones, trauma, duelo agudo, toxinas, fármacos).
-- **Mediadores (M):** Factores biológicos y conductuales que perpetúan el estado inflamatorio crónico (citocinas, estrés oxidativo, disbiósis, insomnio).
+### 4.1. Variables Antropométricas y Signos Vitales
 
-### 4.2. Los 7 Nodos de la Matriz Funcional
-1. **Asimilación:** Digestión, absorción, microbiota gastrointestinal y permeabilidad de la barrera mucosa.
-2. **Defensa e Inmunidad:** Inflamación sistémica, reactividad inmunitaria, autoinmunidad e infecciones crónicas latentes.
-3. **Energía:** Función mitocondrial, fosforilación oxidativa y producción de ATP.
-4. **Biotransformación y Eliminación:** Desintoxicación hepática (Fase I y II), función biliar y excreción renal/colónica.
-5. **Comunicación:** Ejes neuroendocrinos (tiroideo, suprarrenal, gonadal, insulínico) y neurotransmisores.
-6. **Transporte:** Sistema cardiovascular, microcirculación, flujo linfático y transporte transmembrana.
-7. **Integridad Estructural:** Membranas celulares, fascia, citoesqueleto y matriz extracelular.
-
----
-
-## 5. MÓDULO 3: CALCULADORA DE ÍNDICES SUBROGADOS DE RESISTENCIA A LA INSULINA
-
-Calcula en tiempo real biomarcadores validados internacionalmente a partir de la química sanguínea convencional:
-
-| Índice | Fórmula Clínica | Rango Óptimo Funcional | Umbral de Fricción |
+| Campo / Ítem | Unidad | ¿Para qué sirve? (Relevancia Clínica) | Rango Funcional Óptimo |
 | :--- | :--- | :--- | :--- |
-| **HOMA-IR** | $\frac{\text{Glucosa} (\text{mg/dL}) \times \text{Insulina} (\mu\text{IU/mL})}{405}$ | $< 1.5$ | $\ge 2.0$ (Severo $\ge 3.0$) |
-| **QUICKI** | $\frac{1}{\log(\text{Glucosa}) + \log(\text{Insulina})}$ | $> 0.38$ | $< 0.33$ |
-| **TyG Index** | $\ln\left(\frac{\text{Triglicéridos} \times \text{Glucosa}}{2}\right)$ | $< 8.0$ | $\ge 8.5$ |
-| **TyG-BMI** | $\text{TyG} \times \text{IMC} (\text{kg/m}^2)$ | $< 180$ | $\ge 215$ |
-| **METS-IR** | $\frac{\ln(2 \times \text{Glucosa} + \text{Triglicéridos}) \times \text{IMC}}{\ln(\text{HDL})}$ | $< 35.0$ | $\ge 45.0$ |
-| **Ratio TG/HDL** | $\frac{\text{Triglicéridos}}{\text{HDL}}$ | $< 1.5$ | $\ge 2.5$ |
-| **LAP** (Hombres) | $(\text{Cintura} - 65) \times \text{TG} \times 0.011$ | $< 25$ | $\ge 45$ |
-| **LAP** (Mujeres) | $(\text{Cintura} - 58) \times \text{TG} \times 0.011$ | $< 20$ | $\ge 38$ |
-| **FLI** | Ecuación logística basada en TG, GGT, IMC y Cintura | $< 30$ | $\ge 60$ (Riesgo de Esteatosis) |
+| **Horas de Ayuno** | Horas ($h$) | Estandariza la fase metabólica postabsortiva. Un ayuno menor a 10h o mayor a 16h invalida la precisión de HOMA-IR y TyG. | $12.0 - 14.0\text{ h}$ |
+| **Peso y Talla** | $\text{kg}$, $\text{cm}$ | Permite calcular el Índice de Masa Corporal ($\text{IMC} = \text{kg}/\text{m}^2$) y alimentar las ecuaciones de TyG-BMI, METS-IR y FLI. | $\text{IMC: } 18.5 - 24.9$ |
+| **Perímetro de Cintura** | $\text{cm}$ | Estimador indirecto de mayor precisión para grasa visceral y esteatosis hepática. Alimenta las fórmulas de LAP y FLI. | M: $< 80\text{ cm}$ / H: $< 90\text{ cm}$ |
+| **Presión Arterial (PA)** | $\text{mmHg}$ | Evalúa disfunción endotelial y tono simpático aumentado por hiperinsulinemia compensatoria renal. | $< 120 / 80\text{ mmHg}$ |
+| **Frecuencia Cardíaca** | $\text{lpm}$ | Marcador de tono autonómico y balance simpático-vagal en reposo. | $60 - 75\text{ lpm}$ |
+
+### 4.2. Perfil Bioquímico y Biomarcadores Sanguíneos
+
+| Campo / Ítem | Unidad | ¿Para qué sirve? (Relevancia Clínica) | Rango Funcional Óptimo |
+| :--- | :--- | :--- | :--- |
+| **Glucosa Basal** | $\text{mg/dL}$ | Evalúa la producción hepática basal de glucosa (gluconeogénesis y glucogenólisis) regulada por la insulina portal. | $70 - 89\text{ mg/dL}$ |
+| **Insulina Basal** | $\mu\text{IU/mL}$ | Determina el esfuerzo secretor del páncreas. La elevación $> 6.0\,\mu\text{IU/mL}$ indica hiperinsulinemia compensatoria temprana años antes de que suba la glucosa. | $2.0 - 6.0\,\mu\text{IU/mL}$ |
+| **Triglicéridos (TG)** | $\text{mg/dL}$ | Refleja lipogénesis hepática de novo impulsada por hiperinsulinemia y exceso de fructosa/carbohidratos refinados. | $< 100\text{ mg/dL}$ |
+| **HDL-Colesterol** | $\text{mg/dL}$ | Mide partículas antiinflamatorias y capacidad de transporte reverso de colesterol. En resistencia a la insulina, el HDL se reduce y se vuelve disfuncional. | M: $> 55\text{ mg/dL}$ / H: $> 50\text{ mg/dL}$ |
+| **GGT (Gamma-Glutamil)**| $\text{U/L}$ | Marcador de depleción de glutatión celular, estrés oxidativo intrahepático y riesgo de esteatosis metabólica (MASLD/NAFLD). | $< 20\text{ U/L}$ |
+| **hs-CRP (PCR-us)** | $\text{mg/L}$ | Evalúa endotoxemia metabólica (LPS traslocado por permeabilidad intestinal) e inflamación endotelial de bajo grado. | $< 0.8\text{ mg/L}$ |
+| **HbA1c** | $\%$ | Mide el promedio de exposición glucémica eritrocitaria en los últimos 90-120 días. | $4.8\% - 5.4\%$ |
+| **Transaminasas (AST/ALT)**| $\text{U/L}$ | Evalúa inflamación y daño hepatocelular secundario a lipotoxicidad mitocondrial. | $\text{ALT: } < 20\text{ U/L}$ / $\text{AST: } < 22\text{ U/L}$ |
+
+### 4.3. Curva de Sobrecarga Oral a la Glucosa (Kraft OGTT - 5 Puntos)
+
+| Punto Temporal | Parámetros | ¿Para qué sirve? | Comportamiento Esperado Óptimo |
+| :--- | :--- | :--- | :--- |
+| **0 min (Basal)** | Glucosa / Insulina | Estado metabólico de reposo | Glucosa $< 90\text{ mg/dL}$, Insulina $< 6\,\mu\text{IU/mL}$ |
+| **30 min** | Glucosa / Insulina | Evalúa la **Fase 1 de secreción insulínica** (liberación rápida de gránulos preformados). | Pico precoz de insulina ($< 60\,\mu\text{IU/mL}$) |
+| **60 min** | Glucosa / Insulina | Pico fisiológico de absorción intestinal de glucosa. | Glucosa $< 140\text{ mg/dL}$, Insulina en descenso |
+| **120 min** | Glucosa / Insulina | Evalúa la **Fase 2 de secreción** y el aclaramiento periférico en músculo y tejido adiposo. | Glucosa $< 100\text{ mg/dL}$, Insulina $< 30\,\mu\text{IU/mL}$ |
+| **180 min** | Glucosa / Insulina | Retorno a la homeostasis basal. Detecta hiperinsulinemia retardada severa o hipoglucemia reactiva. | Retorno completo a valores basales ($\text{Insulina } < 10\,\mu\text{IU/mL}$) |
 
 ---
 
-## 6. MÓDULO 4: ANÁLISIS DE CURVAS DE SOBRECARGA ORAL A LA GLUCOSA (KRAFT OGTT)
+## 5. METODOLOGÍA Y PROTOCOLO DE SEGUIMIENTO LONGITUDINAL
 
-El análisis del Dr. Joseph R. Kraft evalúa la curva de respuesta de insulina tras una sobrecarga de 75 g de glucosa a los 0, 30, 60, 120 y 180 minutos:
+El seguimiento en Medicina Funcional no evalúa únicamente cifras estáticas, sino la **trayectoria dinámica de resolución de la fricción metabólica** y la restauración de la flexibilidad celular.
 
-- **Patrón Kraft I (Curva Euinsulinémica Óptima):** Insulina basal $< 10\,\mu\text{IU/mL}$, pico a los 30-60 min $< 60\,\mu\text{IU/mL}$, retorno veloz a $< 30\,\mu\text{IU/mL}$ a las 2h y nivel basal a las 3h.
-- **Patrón Kraft II (Hiperinsulinemia Retardada Tipo A):** Pico máximo desplazado a los 120 min, retraso en el aclaramiento.
-- **Patrón Kraft III-A / III-B (Hiperinsulinemia Retardada Severa):** Pico a los 120 o 180 min con niveles sostenidos $> 50\,\mu\text{IU/mL}$.
-- **Patrón Kraft IV (Hiperinsulinemia Basal / Resistencia Crónica):** Insulina basal $> 25\,\mu\text{IU/mL}$ con curva marcadamente aplanada o desproporcionada.
-- **Patrón Kraft V (Hipoinsulinismo / Agotamiento de Células Beta):** Incapacidad secretora de insulina, indicativo de progresión a falla pancreática endócrina.
+### 5.1. Cronograma Estándar de Controles Clínicos
 
----
+```
+Consulta 0 (Basal)       Consulta 1 (Semana 6 - 8)     Consulta 2 (Mes 3 - 4)        Consulta 3 (Mes 6)
+      │                                │                            │                           │
+      ▼                                ▼                            ▼                           ▼
+- Perfil Completo ATM        - Ajuste Protocolo 5R        - Repetición Lab Subrogados   - Re-evaluación OGTT
+- Kraft OGTT + Labs          - Telemetría CGM (TIR)       - Cálculo de Deltas (Δ)       - Consolidación Estilo
+- Asignación Estrato         - Re-evaluación Síntomas     - Ajuste Nutracéuticos        - Estrato 0 Alcanzado
+```
 
-## 7. MÓDULO 5: CDSS, ATRIBUCIÓN SHAP & ESTRATIFICACIÓN DE RIESGO
-
-El motor CDSS (*Clinical Decision Support System*) utiliza un ensamble **XGBoost** con explicabilidad **SHAP** (*SHapley Additive exPlanations*):
-
-### Estratificación Metabólica Funcional:
-- **Estrato 0 (Flexibilidad Metabólica Óptima):** Sin resistencia a la insulina ni inflamación subclínica.
-- **Estrato 1 (Fricción Metabólica Temprana):** Hiperinsulinemia compensatoria con glucemias normales.
-- **Estrato 2 (Resistencia a la Insulina Establecida & Disfunción Mitocondrial):** Elevación de HOMA-IR, TyG y esteatosis subclínica.
-- **Estrato 3 (Disfunción Cardiometabólica Avanzada & Fricción Multiorgánica):** Riesgo vascular alto, esteatohepatitis y agotamiento insulínico.
-
----
-
-## 8. MÓDULO 6: MATRIZ TERAPÉUTICA & PROTOCOLOS FUNCIONALES
-
-Integra las intervenciones terapéuticas estructuradas:
-1. **Protocolo 5R de Restauración Digestiva:**
-   - *Remove (Remover):* Patógenos, alérgenos y alimentos proinflamatorios.
-   - *Replace (Reemplazar):* Ácido clorhídrico, enzimas digestivas y sales biliares.
-   - *Reinoculate (Reopular):* Probióticos y prebióticos específicos.
-   - *Repair (Reparar):* L-Glutamina, zinc-carnosina, quercetina y omega-3.
-   - *Rebalance (Reequilibrar):* Higiene de vida, modulación vagal y ritmos circadianos.
-2. **Entrenamiento en Zona 2 Mitocondrial:** Estímulo de biogénesis mitocondrial y aclaramiento de lactato.
-3. **Crononutrición & Ventana de Alimentación Restringida (TRE):** Optimización de la sensibilidad insulínica circadiana.
+### 5.2. Métricas de Éxito en el Seguimiento Longitudinal:
+1. **Delta HOMA-IR ($\Delta\text{HOMA-IR}$):** Reducción progresiva hacia $< 1.5$.
+2. **Delta Ratio TG/HDL ($\Delta\text{TG/HDL}$):** Disminución por debajo de $1.5$ (indicador clave de partículas LDL pequeñas y densas no aterogénicas).
+3. **Optimización CGM:**
+   - Aumento del **Tiempo en Rango ($70-140\text{ mg/dL}$)** a $> 85\%$.
+   - Reducción de la variabilidad glucémica ($\text{CV} < 20\%$).
+   - Desaparición de picos postprandiales $> 140\text{ mg/dL}$.
+4. **Desescalada de Estrato Metabólico:** Transición documentada de Estrato 2/3 $\rightarrow$ Estrato 1 $\rightarrow$ Estrato 0.
 
 ---
 
-## 9. MÓDULO 7: MONITOREO CONTINUO (CGM) & ECOSISTEMA HL7 FHIR R4
+## 6. MÓDULO 1: EXPEDIENTE DEL PACIENTE & DASHBOARD DE COHORTE
 
-Permite la ingesta y análisis de telemetría de sensores CGM (FreeStyle Libre, Dexcom) con métricas estandarizadas:
-- **TIR (Time in Range 70-140 mg/dL):** Meta funcional $\ge 85\%$.
-- **TAR (Time Above Range > 140 mg/dL):** Meta funcional $< 10\%$.
-- **TBR (Time Below Range < 70 mg/dL):** Meta $< 4\%$.
-- **CV (Coeficiente de Variabilidad Glucémica):** Meta funcional $< 20\%$.
-
-### Recursos FHIR R4 Compatibles:
-- `DiagnosticReport`: Informes de pruebas de laboratorio y curvas OGTT.
-- `Observation`: Biomarcadores individuales (glucosa, insulina, HOMA-IR, triglicéridos).
-- `Patient`: Demografía y trazabilidad del expediente.
-- `Practitioner`: Identificación y licencia del especialista firmante.
+Permite la administración integral de historias clínicas y cohorte metabólica:
+- **Búsqueda Dinámica:** Localización instantánea por nombre, MRN, médico asignado o estrato.
+- **Acciones Rápidas:** Botones para añadir nueva evolución, exportar PDF, ver telemetría FHIR o abrir la matriz ATM.
 
 ---
 
-## 10. MÓDULO 8: CONFIGURACIÓN DEL EQUIPO MÉDICO & FIRMAS DIGITALES
+## 7. MÓDULO 2: MARCO FISIOPATOLÓGICO ATM & MATRIZ DE LOS 7 NODOS
 
-- **Gestión de Especialistas:** Registro de nombres, especialidades, instituciones y matrículas médicas.
-- **Firmas Digitalizadas:** Carga de firma escaneada o dibujo táctil en pantalla de alta resolución.
-- **Parametrización de Credenciales:** Asignación de usuario `@login`, contraseña y rol (*Super Administrador*, *Administrador*, *Especialista*).
+Mapea la raíz fisiopatológica del paciente según el modelo del *Institute for Functional Medicine (IFM)*:
+- **Antecedentes (A):** Factores genéticos, epigenéticos y familiares.
+- **Gatilladores (T):** Detonantes biológicos, ambientales o emocionales.
+- **Mediadores (M):** Factores que sostienen la inflamación y el daño crónico.
+- **Los 7 Nodos Biológicos:** Asimilación, Defensa, Energía, Biotransformación, Comunicación, Transporte e Integridad Estructural.
 
 ---
 
-## 11. GLOSARIO OFICIAL DE ACRÓNIMOS Y ABREVIATURAS
+## 8. MÓDULO 3: CALCULADORA DE ÍNDICES SUBROGADOS
 
-### A
-- **ADA:** *American Diabetes Association* (Asociación Americana de Diabetes).
-- **ALT:** Alanina Aminotransferasa (Enzima hepática, también conocida como GPT).
-- **AST:** Aspartato Aminotransferasa (Enzima hepática, también conocida como GOT).
-- **ATM:** Antecedentes, Gatilladores (*Triggers*), Mediadores (*Mediators*) en Medicina Funcional.
-- **ATP:** Adenosín Trifosfato (Moneda energética celular producida por la mitocondria).
-- **AUC:** *Area Under the Curve* (Área Bajo la Curva en cinética farmacológica y curvas OGTT).
+Calcula en tiempo real los índices de mayor validación científica internacional:
+- **HOMA-IR:** Resistencia a la insulina basal hepática.
+- **QUICKI:** Sensibilidad insulínica global (inverso logarítmico).
+- **TyG & TyG-BMI:** Resistencia muscular y sobrecarga lipogénica.
+- **METS-IR:** Índice cardiometabólico ajustado por HDL y masa corporal.
+- **LAP (Lipid Accumulation Product):** Riesgo de adiposidad visceral ectópica.
+- **FLI (Fatty Liver Index):** Probabilidad de esteatosis hepática metabólica.
 
-### B
-- **BMI / IMC:** *Body Mass Index* / Índice de Masa Corporal ($\text{kg/m}^2$).
-- **BP / PA:** *Blood Pressure* / Presión Arterial ($\text{mmHg}$).
+---
 
-### C
-- **CDSS:** *Clinical Decision Support System* (Sistema de Soporte a Decisiones Clínicas).
-- **CGM:** *Continuous Glucose Monitoring* (Monitoreo Continuo de Glucosa intersticial).
-- **CV:** Coeficiente de Variabilidad Glucémica ($\text{Desviación Estándar} / \text{Media} \times 100$).
+## 9. MÓDULO 4: ANÁLISIS DE CURVAS KRAFT OGTT
 
-### D
-- **DASH:** *Dietary Approaches to Stop Hypertension* (Enfoque dietario antihipertensivo).
-- **DHEA-S:** Dehidroepiandrosterona Sulfato (Marcador suprarrenal).
+Clasifica la respuesta de insulina a 3 horas en 5 patrones fisiopatológicos fundamentales:
+- **Patrón I:** Curva euinsulinémica normal / óptima.
+- **Patrón II:** Hiperinsulinemia retardada moderada.
+- **Patrón III-A / III-B:** Hiperinsulinemia retardada severa sostenida.
+- **Patrón IV:** Hiperinsulinemia basal con resistencia periférica grave.
+- **Patrón V:** Falla o agotamiento secretor de células beta pancreáticas.
 
-### F
-- **FHIR:** *Fast Healthcare Interoperability Resources* (Estándar internacional HL7 de interoperabilidad en salud).
-- **FLI:** *Fatty Liver Index* (Índice de Hígado Graso para predicción de esteatosis hepática no alcohólica).
+---
 
-### G
-- **GGT:** Gamma-Glutamil Transferasa (Marcador enzimático de colestasis, estrés oxidativo y riesgo metabólico).
-- **GIR:** *Glucose-to-Insulin Ratio* (Ratio Glucosa/Insulina).
-- **GLP-1:** *Glucagon-Like Peptide-1* (Péptido similar al glucagón tipo 1).
+## 10. MÓDULO 5: CDSS, ATRIBUCIÓN SHAP & ESTRATIFICACIÓN
 
-### H
-- **HbA1c:** Hemoglobina Glicosilada (Promedio de glucemia de los últimos 90-120 días).
-- **HDL:** *High-Density Lipoprotein* (Lipoproteínas de alta densidad).
-- **HIPAA:** *Health Insurance Portability and Accountability Act* (Ley de privacidad y seguridad médica).
-- **HOMA-IR:** *Homeostatic Model Assessment of Insulin Resistance* (Evaluación del Modelo Homeostático de Resistencia a la Insulina).
-- **hs-CRP / PCR-us:** *High-Sensitivity C-Reactive Protein* / Proteína C Reactiva Ultrasensible (Marcador de inflamación endotelial).
+El motor de soporte diagnóstico utiliza un modelo de árboles potenciados **XGBoost**:
+- **Explicabilidad SHAP:** Visualiza exactamente qué variables del paciente (ej. Insulina 14.8, TG/HDL 4.1, GGT 34) están empujando el riesgo metabólico al alza.
+- **Estratos 0 a 3:** Semáforo clínico de intervención terapéutica.
 
-### I
-- **IFM:** *Institute for Functional Medicine* (Instituto de Medicina Funcional de EE. UU.).
-- **IFMCP:** *Institute for Functional Medicine Certified Practitioner* (Especialista Certificado por el IFM).
+---
 
-### K
-- **Kraft OGTT:** Prueba de tolerancia a la glucosa oral con medición seriada de insulina descrita por el Dr. Joseph R. Kraft.
+## 11. MÓDULO 6: MATRIZ TERAPÉUTICA & PROTOCOLOS FUNCIONALES
 
-### L
-- **LAP:** *Lipid Accumulation Product* (Producto de Acumulación Lipídica basado en triglicéridos y perímetro de cintura).
-- **LDL:** *Low-Density Lipoprotein* (Lipoproteínas de baja densidad).
+- **Protocolo 5R:** *Remove, Replace, Reinoculate, Repair, Rebalance* para integridad de mucosa digestiva.
+- **Zona 2 Mitocondrial:** Entrenamiento cardiovascular en zona de máxima oxidación lipídica.
+- **Crononutrición:** Sincronización de ingesta con el reloj maestro circadiano supraquiasmático.
 
-### M
-- **METS-IR:** *Metabolic Score for Insulin Resistance* (Puntuación Metabólica para Resistencia a la Insulina).
-- **MRN:** *Medical Record Number* (Número de Historia Clínica / Expediente del Paciente).
-- **MSc:** *Master of Science* (Magíster en Ciencias).
+---
 
-### N
-- **NAFLD / MASLD:** *Metabolic dysfunction-Associated Steatotic Liver Disease* (Enfermedad Hepática Esteatósica Metabólica).
+## 12. MÓDULO 7: MONITOREO CONTINUO (CGM) & ECOSISTEMA HL7 FHIR R4
 
-### O
-- **OGTT / PTOG:** *Oral Glucose Tolerance Test* / Prueba de Tolerancia Oral a la Glucosa (Sobrecarga de 75 g).
+- **Telemetría CGM 24 Horas:** Gráficos continuos de glucosa con cálculo de TIR, TAR, TBR y Coeficiente de Variación.
+- **Recursos FHIR R4 Interoperables:** Generación de JSON estándar para `DiagnosticReport`, `Observation`, `Patient`, y `Practitioner`.
 
-### Q
-- **QUICKI:** *Quantitative Insulin Sensitivity Check Index* (Índice Cuantitativo de Sensibilidad a la Insulina).
+---
 
-### R
-- **RLS:** *Row Level Security* (Seguridad a Nivel de Fila en bases de datos PostgreSQL / Supabase).
-- **ROS:** *Reactive Oxygen Species* (Especies Reactivas de Oxígeno / Estrés Oxidativo).
+## 13. MÓDULO 8: CONFIGURACIÓN DEL EQUIPO MÉDICO & FIRMAS DIGITALES
 
-### S
-- **SHAP:** *SHapley Additive exPlanations* (Algoritmo de teoría de juegos para explicabilidad e interpretabilidad de Inteligencia Artificial).
-- **SPA:** *Single Page Application* (Aplicación Web de Página Única).
+- **Gestión de Profesionales:** Administración de especialistas médicos, matrículas y cargos.
+- **Firmas Digitales:** Dibujo táctil en pantalla o carga de firma escaneada con sellos institucionales.
+- **Exportación de Reportes en PDF:** Informes médicos de alta fidelidad estética y rigor clínico listos para impresión o entrega al paciente.
 
-### T
-- **TAR:** *Time Above Range* (Tiempo sobre el Rango Glucémico $> 140\,\text{mg/dL}$).
-- **TBR:** *Time Below Range* (Tiempo bajo el Rango Glucémico $< 70\,\text{mg/dL}$).
-- **TG:** Triglicéridos séricos.
-- **TIR:** *Time In Range* (Tiempo en Rango Glucémico Óptimo $70-140\,\text{mg/dL}$).
-- **TP / RM:** Tarjeta Profesional / Registro Médico del Especialista.
-- **TRE:** *Time-Restricted Eating* (Ventana de Alimentación Restringida en el Tiempo).
-- **TyG:** *Triglyceride-Glucose Index* (Índice Triglicéridos-Glucosa).
-- **TyG-BMI:** Índice Triglicéridos-Glucosa ajustado por Índice de Masa Corporal.
+---
 
-### V
-- **VAI:** *Visceral Adiposity Index* (Índice de Adiposidad Visceral).
-- **VLDL:** *Very Low-Density Lipoprotein* (Lipoproteínas de muy baja densidad).
+## 14. GLOSARIO OFICIAL DE ACRÓNIMOS Y ABREVIATURAS
 
-### X
-- **XGBoost:** *eXtreme Gradient Boosting* (Algoritmo de aprendizaje automático de árboles de decisión potenciados).
+| Acrónimo | Término Completo | Definición Clínica / Metodológica |
+| :--- | :--- | :--- |
+| **ADA** | *American Diabetes Association* | Asociación Americana de Diabetes. |
+| **ALT** | Alanina Aminotransferasa | Enzima citosólica hepática indicadora de lipotoxicidad y daño hepatocelular. |
+| **AST** | Aspartato Aminotransferasa | Enzima mitocondrial y citosólica presente en hígado, corazón y músculo. |
+| **ATM** | Antecedentes, Gatilladores, Mediadores | Marco de razonamiento fisiopatológico en Medicina Funcional. |
+| **ATP** | Adenosín Trifosfato | Molécula energética celular sintetizada en la fosforilación oxidativa mitocondrial. |
+| **AUC** | *Area Under the Curve* | Área bajo la curva de glucosa e insulina en pruebas dinámicas OGTT. |
+| **CDSS** | *Clinical Decision Support System* | Sistema informatizado de soporte a la toma de decisiones clínicas. |
+| **CGM** | *Continuous Glucose Monitoring* | Monitoreo continuo de glucosa intersticial en tiempo real. |
+| **CV** | Coeficiente de Variabilidad | Medida porcentual de fluctuaciones glucémicas ($\text{DE}/\text{Media}\times 100$). |
+| **FHIR** | *Fast Healthcare Interoperability Resources* | Estándar internacional HL7 para intercambio electrónico de datos en salud. |
+| **FLI** | *Fatty Liver Index* | Algoritmo predictivo de esteatosis hepática no alcohólica basado en IMC, cintura, TG y GGT. |
+| **GGT** | Gamma-Glutamil Transferasa | Enzima de membrana y marcador de estrés oxidativo y sobrecarga tóxica hepática. |
+| **HbA1c** | Hemoglobina Glicosilada A1c | Fracción de hemoglobina unida a glucosa; promedio glucémico de 3 meses. |
+| **HDL** | *High-Density Lipoprotein* | Lipoproteínas de alta densidad participantes en el transporte reverso de colesterol. |
+| **HIPAA** | *Health Insurance Portability and Accountability Act* | Ley estándar de confidencialidad y seguridad de datos médicos. |
+| **HOMA-IR** | *Homeostatic Model Assessment of Insulin Resistance* | Índice de resistencia hepática a la insulina calculado a partir de glucosa e insulina basal. |
+| **hs-CRP** | *High-Sensitivity C-Reactive Protein* | Proteína C Reactiva Ultrasensible; biomarcador de inflamación vascular subclínica. |
+| **IFMCP** | *Institute for Functional Medicine Certified Practitioner* | Médico especialista certificado por el Instituto de Medicina Funcional. |
+| **IMC / BMI** | Índice de Masa Corporal | Relación de peso respecto a la estatura al cuadrado ($\text{kg/m}^2$). |
+| **Kraft OGTT** | Prueba Kraft de Tolerancia a la Glucosa | Protocolo de 5 tomas de insulina y glucosa a 3 horas ideado por el Dr. Joseph Kraft. |
+| **LAP** | *Lipid Accumulation Product* | Indicador de acumulación lipídica visceral y riesgo aterogénico. |
+| **LDL** | *Low-Density Lipoprotein* | Lipoproteínas de baja densidad transportadoras de colesterol a tejidos. |
+| **MASLD** | *Metabolic dysfunction-Associated Steatotic Liver Disease* | Nueva nomenclatura médica para la enfermedad hepática esteatósica metabólica. |
+| **METS-IR** | *Metabolic Score for Insulin Resistance* | Puntuación de sensibilidad insulínica con alta concordancia con el clamp euglucémico. |
+| **MRN** | *Medical Record Number* | Número único de historia clínica y expediente electrónico del paciente. |
+| **OGTT / PTOG** | *Oral Glucose Tolerance Test* | Sobrecarga oral con 75 g de glucosa anhidra para evaluación funcional endocrina. |
+| **QUICKI** | *Quantitative Insulin Sensitivity Check Index* | Índice cuantitativo de sensibilidad insulínica basado en escala logarítmica. |
+| **RLS** | *Row Level Security* | Políticas de seguridad de base de datos a nivel de registro en PostgreSQL/Supabase. |
+| **SHAP** | *SHapley Additive exPlanations* | Método de teoría de juegos para interpretar las predicciones de modelos de Machine Learning. |
+| **TAR** | *Time Above Range* | Porcentaje de tiempo con glucosa intersticial $> 140\text{ mg/dL}$. |
+| **TBR** | *Time Below Range* | Porcentaje de tiempo con glucosa intersticial $< 70\text{ mg/dL}$ (hipoglucemia). |
+| **TG** | Triglicéridos | Ésteres de glicerol y ácidos grasos; marcador de sobrecarga lipídica. |
+| **TIR** | *Time In Range* | Porcentaje de tiempo en rango normoglucémico óptimo ($70-140\text{ mg/dL}$). |
+| **TRE** | *Time-Restricted Eating* | Estrategia de alimentación con ventana horaria restringida (ayuno intermitente). |
+| **TyG** | *Triglyceride-Glucose Index* | Índice de triglicéridos y glucosa; marcador sustituto de resistencia periférica. |
+| **VAI** | *Visceral Adiposity Index* | Modelo matemático de distribución grasa y disfunción del tejido adiposo. |
+| **XGBoost** | *eXtreme Gradient Boosting* | Algoritmo de ensamble de árboles de decisión de alto rendimiento en analítica clínica. |
