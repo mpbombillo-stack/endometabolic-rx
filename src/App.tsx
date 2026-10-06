@@ -26,12 +26,35 @@ import { CdssScreen } from './screens/CdssScreen';
 import { TherapeuticsScreen } from './screens/TherapeuticsScreen';
 import { MonitoringFhirScreen } from './screens/MonitoringFhirScreen';
 
+import { LoginScreen } from './screens/LoginScreen';
+
 const PROFESSIONALS_STORAGE_KEY = 'endometabolic_rx_professionals_v1';
 const ACTIVE_DOCTOR_ID_KEY = 'endometabolic_rx_active_doctor_id';
+const AUTH_SESSION_KEY = 'endometabolic_rx_session_v1';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<ScreenTab>('patients-dashboard');
   const [clinicalMode, setClinicalMode] = useState<boolean>(true);
+
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<MedicalProfessional | null>(() => {
+    try {
+      const storedSession = localStorage.getItem(AUTH_SESSION_KEY) || sessionStorage.getItem(AUTH_SESSION_KEY);
+      if (storedSession) {
+        return JSON.parse(storedSession);
+      }
+    } catch (e) {}
+    return null;
+  });
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      const storedSession = localStorage.getItem(AUTH_SESSION_KEY) || sessionStorage.getItem(AUTH_SESSION_KEY);
+      return !!storedSession;
+    } catch (e) {
+      return false;
+    }
+  });
 
   // Patients Management State
   const [patients, setPatients] = useState<PatientProfile[]>(() => getStoredPatients());
@@ -132,6 +155,35 @@ export default function App() {
     } catch (e) {}
   }, [activeDoctorId]);
 
+  const handleLoginSuccess = (user: MedicalProfessional, remember: boolean) => {
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    setActiveDoctorId(user.id);
+
+    try {
+      const userStr = JSON.stringify(user);
+      if (remember) {
+        localStorage.setItem(AUTH_SESSION_KEY, userStr);
+        sessionStorage.removeItem(AUTH_SESSION_KEY);
+      } else {
+        sessionStorage.setItem(AUTH_SESSION_KEY, userStr);
+        localStorage.removeItem(AUTH_SESSION_KEY);
+      }
+    } catch (e) {}
+
+    showToast(`¡Bienvenido al sistema clínico, ${user.fullName}!`);
+  };
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem(AUTH_SESSION_KEY);
+      sessionStorage.removeItem(AUTH_SESSION_KEY);
+    } catch (e) {}
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    showToast('Sesión clínica finalizada de forma segura.');
+  };
+
   const handleToggleClinicalMode = () => {
     setClinicalMode((prev) => !prev);
     showToast(
@@ -201,6 +253,19 @@ export default function App() {
     showToast(`¡Protocolo de ${nodeName} añadido al expediente de ${activePatient.fullName}!`);
   };
 
+  // If user is not authenticated, display Login Gate
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LoginScreen
+          professionals={professionals}
+          onLoginSuccess={handleLoginSuccess}
+        />
+        <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#fff8f5] text-[#1e1b19] font-sans antialiased selection:bg-[#005c55]/20 selection:text-[#005c55]">
       {/* Top Header */}
@@ -212,6 +277,7 @@ export default function App() {
         currentPatient={activePatient}
         activeDoctor={activeDoctor}
         onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* Persistent Left Clinical Sidebar (Triaje y Cohorte) */}
@@ -310,6 +376,19 @@ export default function App() {
               professionals={professionals}
               onUpdateProfessionals={(updated) => {
                 setProfessionals(updated);
+                if (currentUser) {
+                  const updatedCurrent = updated.find((u) => u.id === currentUser.id);
+                  if (updatedCurrent) {
+                    setCurrentUser(updatedCurrent);
+                    try {
+                      if (localStorage.getItem(AUTH_SESSION_KEY)) {
+                        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedCurrent));
+                      } else {
+                        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedCurrent));
+                      }
+                    } catch (e) {}
+                  }
+                }
                 updated.forEach((doc) => saveProfessionalToCloud(doc));
               }}
               activeDoctorId={activeDoctorId}

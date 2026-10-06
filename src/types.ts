@@ -117,6 +117,9 @@ export interface MedicalProfessional {
   signatureUrl?: string; // Data URL (Base64) de la firma escaneada o dibujada
   isPrimary?: boolean;
   registeredAt: string;
+  username?: string; // Login de acceso (ej: 'mausugu')
+  password?: string; // Contraseña de acceso (ej: 'M77')
+  role?: 'superadmin' | 'admin' | 'doctor';
 }
 
 export interface PatientEvolution {

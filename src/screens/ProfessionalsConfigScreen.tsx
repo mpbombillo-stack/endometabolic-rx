@@ -29,6 +29,10 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [signatureUrl, setSignatureUrl] = useState<string | undefined>(undefined);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState<'superadmin' | 'admin' | 'doctor'>('doctor');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Canvas for Digital Signature
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -46,6 +50,9 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
       setEmail(prof.email);
       setPhone(prof.phone);
       setSignatureUrl(prof.signatureUrl);
+      setUsername(prof.username || (prof.isPrimary ? 'mausugu' : 'doctor'));
+      setPassword(prof.password || 'M77');
+      setRole(prof.role || (prof.isPrimary ? 'superadmin' : 'doctor'));
     } else {
       setEditingId(null);
       setFullName('');
@@ -56,7 +63,11 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
       setEmail('');
       setPhone('');
       setSignatureUrl(undefined);
+      setUsername(`dr_${Math.floor(100 + Math.random() * 900)}`);
+      setPassword('M77');
+      setRole('doctor');
     }
+    setShowPassword(false);
     setIsEditing(true);
   };
 
@@ -82,10 +93,13 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
               email: email.trim(),
               phone: phone.trim(),
               signatureUrl,
+              username: username.trim().toLowerCase(),
+              password: password.trim(),
+              role,
             }
           : p
       );
-      onShowToast(`Perfil del ${fullName} actualizado con éxito.`);
+      onShowToast(`Perfil del ${fullName} y credenciales actualizados con éxito.`);
     } else {
       const newProf: MedicalProfessional = {
         id: `doc-${Date.now()}`,
@@ -99,9 +113,12 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
         signatureUrl,
         isPrimary: professionals.length === 0,
         registeredAt: new Date().toISOString().split('T')[0],
+        username: username.trim().toLowerCase() || `user_${Date.now().toString().slice(-4)}`,
+        password: password.trim() || 'M77',
+        role: role || (professionals.length === 0 ? 'superadmin' : 'doctor'),
       };
       updatedList = [...professionals, newProf];
-      onShowToast(`Profesional ${fullName} registrado exitosamente.`);
+      onShowToast(`Profesional ${fullName} registrado exitosamente con usuario @${newProf.username}.`);
     }
 
     onUpdateProfessionals(updatedList);
@@ -272,6 +289,23 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                     <span className="text-[#6e7977]">Registro / Matrícula:</span>
                     <span className="font-mono font-bold text-[#1e1b19] bg-[#faf2ee] px-1.5 py-0.5 rounded border border-[#e9e1dd]">
                       {prof.licenseNumber}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#6e7977]">Usuario / Login:</span>
+                    <span className="font-mono font-bold text-[#005c55] bg-[#005c55]/10 px-1.5 py-0.5 rounded border border-[#005c55]/20 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[12px]">badge</span>
+                      @{prof.username || 'mausugu'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#6e7977]">Rol de Acceso:</span>
+                    <span className="font-semibold text-[#1e1b19] text-[11px] capitalize">
+                      {prof.role === 'superadmin'
+                        ? 'Super Administrador'
+                        : prof.role === 'admin'
+                        ? 'Administrador Clínico'
+                        : 'Especialista Médico'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -472,6 +506,79 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                     className="w-full px-3 py-2 text-xs rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-[#fff8f5]"
                   />
                 </div>
+              </div>
+
+              {/* Security & Access Credentials Section */}
+              <div className="p-4 bg-gradient-to-br from-[#005c55]/5 via-[#faf2ee] to-white rounded-xl border border-[#005c55]/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#005c55] uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-base">lock_person</span>
+                    Credenciales de Acceso al Sistema
+                  </span>
+                  <span className="text-[10px] font-mono text-[#005c55] bg-[#005c55]/10 px-2 py-0.5 rounded font-bold">
+                    Parametrización de Usuario
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#1e1b19] mb-1">
+                      Usuario / Login *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        placeholder="ej. mausugu"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full px-3 py-2 text-xs font-mono rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-white text-[#1e1b19]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] font-bold text-[#1e1b19]">
+                        Contraseña *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[10px] text-[#005c55] hover:underline cursor-pointer"
+                      >
+                        {showPassword ? 'Ocultar' : 'Ver'}
+                      </button>
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-3 py-2 text-xs font-mono rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-white text-[#1e1b19]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#1e1b19] mb-1">
+                      Rol de Permisos
+                    </label>
+                    <select
+                      value={role}
+                      onChange={(e) => setRole(e.target.value as any)}
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-white text-[#1e1b19] cursor-pointer"
+                    >
+                      <option value="superadmin">Super Administrador</option>
+                      <option value="admin">Administrador Clínico</option>
+                      <option value="doctor">Especialista Médico</option>
+                    </select>
+                  </div>
+                </div>
+
+                <p className="text-[10.5px] text-[#6e7977]">
+                  Estas credenciales permiten al profesional identificarse en la pantalla de inicio de sesión clínica y firmar digitalmente expedientes.
+                </p>
               </div>
 
               {/* Digital Signature Section */}

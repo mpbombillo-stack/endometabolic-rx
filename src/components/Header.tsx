@@ -10,6 +10,7 @@ interface HeaderProps {
   currentPatient?: PatientProfile;
   activeDoctor?: MedicalProfessional;
   onOpenNewPatientModal: () => void;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentPatient,
   activeDoctor,
   onOpenNewPatientModal,
+  onLogout,
 }) => {
   const latestEvo = currentPatient?.evolutionHistory[currentPatient.evolutionHistory.length - 1];
 
@@ -73,21 +75,38 @@ export const Header: React.FC<HeaderProps> = ({
             <div
               onClick={() => onTabChange('professionals-config')}
               className="flex items-center gap-2 px-2.5 py-1 bg-[#faf2ee] hover:bg-[#f4ece8] rounded-lg border border-[#e9e1dd] cursor-pointer transition-colors"
-              title="Configuración de especialistas médicos y firmas"
+              title="Configuración de especialistas médicos, credenciales y firmas"
             >
               <div className="w-7 h-7 rounded-full bg-[#005c55] text-white flex items-center justify-center font-bold text-xs shadow-sm">
                 {activeDoctor?.fullName.split(' ')[1]?.[0] || 'D'}
                 {activeDoctor?.fullName.split(' ')[2]?.[0] || 'T'}
               </div>
               <div className="hidden xl:flex flex-col text-left">
-                <span className="text-[11px] font-bold text-[#1e1b19] leading-tight truncate max-w-[130px]">
-                  {activeDoctor?.fullName || 'Dr. M. Thorne, IFMCP'}
-                </span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-[#1e1b19] leading-tight truncate max-w-[130px]">
+                    {activeDoctor?.fullName || 'Dr. M. Suaza Thorne'}
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-[#005c55] bg-[#005c55]/10 px-1 rounded">
+                    @{activeDoctor?.username || 'mausugu'}
+                  </span>
+                </div>
                 <span className="text-[9.5px] text-[#005c55] font-semibold">
                   {activeDoctor?.licenseNumber || 'TP-84920-MD'}
                 </span>
               </div>
             </div>
+
+            {/* Logout Button */}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="p-1.5 text-[#6e7977] hover:text-[#cb2044] hover:bg-[#cb2044]/10 rounded-lg border border-[#e9e1dd] transition-colors cursor-pointer flex items-center gap-1"
+                title="Cerrar sesión clínica"
+              >
+                <span className="material-symbols-outlined text-[18px]">logout</span>
+                <span className="hidden md:inline text-[11px] font-bold">Salir</span>
+              </button>
+            )}
           </div>
         </div>
 

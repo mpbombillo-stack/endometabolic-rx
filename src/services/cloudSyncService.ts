@@ -33,6 +33,9 @@ export async function fetchProfessionalsFromCloud(): Promise<MedicalProfessional
         signatureUrl: doc.signature_url,
         isPrimary: doc.is_primary,
         registeredAt: doc.registered_at,
+        username: doc.username || (doc.is_primary ? 'mausugu' : undefined),
+        password: doc.password || 'M77',
+        role: doc.role || (doc.is_primary ? 'superadmin' : 'doctor'),
       }));
     }
   } catch (e) {
@@ -57,6 +60,9 @@ export async function saveProfessionalToCloud(doc: MedicalProfessional): Promise
       signature_url: doc.signatureUrl,
       is_primary: doc.isPrimary,
       registered_at: doc.registeredAt,
+      username: doc.username,
+      password: doc.password,
+      role: doc.role,
     });
 
     if (error) {

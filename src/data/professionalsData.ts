@@ -8,16 +8,19 @@ const DEFAULT_SIGNATURE_DRA_RESTREPO = `data:image/svg+xml;utf8,<svg xmlns="http
 export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
   {
     id: 'doc-1',
-    fullName: 'Dr. Mauricio Thorne, MD, IFMCP',
-    title: 'Médico Especialista en Medicina Funcional y Antienvejecimiento',
+    fullName: 'Dr. Mauricio Suaza Thorne, MD, IFMCP',
+    title: 'Director Médico Especialista en Medicina Funcional y Regenerativa',
     specialty: 'Endocrinología Metabólica & Medicina de Precisión',
     licenseNumber: 'TP-84920-MD',
-    institution: 'Functional Care Institute • Sede Central',
-    email: 'mthorne@functionalcare.com',
+    institution: 'Functional Care Institute & Metabolic Center',
+    email: 'm.suaza@functionalcare.med',
     phone: '+57 (315) 890-4421',
     signatureUrl: DEFAULT_SIGNATURE_SVG,
     isPrimary: true,
     registeredAt: '2024-01-15',
+    username: 'mausugu',
+    password: 'M77',
+    role: 'superadmin',
   },
   {
     id: 'doc-2',
@@ -31,5 +34,8 @@ export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
     signatureUrl: DEFAULT_SIGNATURE_DRA_RESTREPO,
     isPrimary: false,
     registeredAt: '2024-06-20',
+    username: 'srestrepo',
+    password: 'M77',
+    role: 'doctor',
   },
 ];

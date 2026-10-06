@@ -5,7 +5,7 @@
 -- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. TABLA: PROFESIONALES MÉDICOS Y FIRMAS
+-- 2. TABLA: PROFESIONALES MÉDICOS, CREDENCIALES Y FIRMAS
 CREATE TABLE IF NOT EXISTS public.medical_professionals (
     id TEXT PRIMARY KEY,
     full_name TEXT NOT NULL,
@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS public.medical_professionals (
     phone TEXT,
     signature_url TEXT,
     is_primary BOOLEAN DEFAULT FALSE,
+    username TEXT UNIQUE,
+    password TEXT DEFAULT 'M77',
+    role TEXT DEFAULT 'doctor',
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -90,9 +93,12 @@ CREATE INDEX IF NOT EXISTS idx_patients_mrn ON public.patients(mrn);
 CREATE INDEX IF NOT EXISTS idx_evolutions_patient_id ON public.patient_evolutions(patient_id);
 CREATE INDEX IF NOT EXISTS idx_evolutions_date ON public.patient_evolutions(date DESC);
 
--- 8. DATOS SEMILLA INICIALES (PROFESIONALES)
-INSERT INTO public.medical_professionals (id, full_name, title, specialty, license_number, institution, email, phone, is_primary)
+-- 8. DATOS SEMILLA INICIALES (PROFESIONALES Y SUPER USUARIO)
+INSERT INTO public.medical_professionals (id, full_name, title, specialty, license_number, institution, email, phone, is_primary, username, password, role)
 VALUES 
-  ('doc-1', 'Dr. Mauricio Thorne, MD, IFMCP', 'Médico Especialista en Medicina Funcional y Regenerativa', 'Endocrinología Metabólica & Longevidad Saludable', 'RM-84920-COL', 'Functional Care Institute & Metabolic Center', 'm.thorne@functionalcare.med', '+57 (310) 849-2041', true),
-  ('doc-2', 'Dra. Sofía Restrepo, MD, MSc', 'Especialista en Nutrición Clínica & Medicina Integrativa', 'Gastroenterología Funcional & Microbiota', 'RM-93114-COL', 'Functional Care Institute', 's.restrepo@functionalcare.med', '+57 (315) 772-9901', false)
-ON CONFLICT (id) DO NOTHING;
+  ('doc-1', 'Dr. Mauricio Suaza Thorne, MD, IFMCP', 'Director Médico Especialista en Medicina Funcional y Regenerativa', 'Endocrinología Metabólica & Medicina de Precisión', 'TP-84920-MD', 'Functional Care Institute & Metabolic Center', 'm.suaza@functionalcare.med', '+57 (315) 890-4421', true, 'mausugu', 'M77', 'superadmin'),
+  ('doc-2', 'Dra. Sofía Restrepo, MD, MSc', 'Especialista en Nutrición Clínica & Medicina Integrativa', 'Gastroenterología Funcional & Microbiota', 'TP-91340-MD', 'Functional Care Institute', 's.restrepo@functionalcare.med', '+57 (318) 722-9014', false, 'srestrepo', 'M77', 'doctor')
+ON CONFLICT (id) DO UPDATE SET
+  username = EXCLUDED.username,
+  password = EXCLUDED.password,
+  role = EXCLUDED.role;
