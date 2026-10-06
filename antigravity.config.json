@@ -1,0 +1,25 @@
+{
+  "$schema": "https://developer.google.com/genai/schemas/antigravity-agent.json",
+  "name": "EndoMetabolic Rx - Functional Care",
+  "version": "1.0.0",
+  "base_agent": "antigravity-preview-09-2026",
+  "environment": {
+    "type": "remote",
+    "runtime": "node22",
+    "ports": [3000],
+    "workdir": "/workspace",
+    "entrypoint": "npm run dev",
+    "sources": [
+      {
+        "type": "inline",
+        "target": ".agents/AGENTS.md"
+      }
+    ]
+  },
+  "tools": [
+    { "type": "code_execution" },
+    { "type": "google_search" },
+    { "type": "url_context" }
+  ],
+  "system_instruction": "You are the clinical engineer executing the EndoMetabolic Rx Functional Medicine platform. Follow the instructions in .agents/AGENTS.md, maintain TypeScript safety without any mock regressions, ensure FHIR R4 standard compliance, and serve the application on port 3000."
+}
