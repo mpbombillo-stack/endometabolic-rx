@@ -120,6 +120,7 @@ export interface MedicalProfessional {
   username?: string; // Login de acceso (ej: 'mausugu')
   password?: string; // Contraseña de acceso (ej: 'M77')
   role?: 'superadmin' | 'admin' | 'doctor';
+  mustChangePassword?: boolean; // Obliga a cambio de contraseña en el primer inicio
 }
 
 export interface PatientEvolution {

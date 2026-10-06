@@ -53,3 +53,70 @@ export function generateClinicalUsername(fullName: string): string {
 
   return `${firstName}${firstSurname}${secondSurname}`;
 }
+
+export interface PasswordPolicyResult {
+  isValid: boolean;
+  hasMinLength: boolean;
+  hasNumber: boolean;
+  hasUppercase: boolean;
+  hasSpecialChar: boolean;
+  strengthScore: number; // 0 to 4
+  strengthLabel: 'Muy Débil' | 'Débil' | 'Aceptable' | 'Robusta' | 'Excelente';
+}
+
+/**
+ * Valida que la contraseña cumpla los requisitos de seguridad clínica:
+ * 1. Mínimo 8 caracteres
+ * 2. Al menos un número (0-9)
+ * 3. Al menos una letra mayúscula (A-Z)
+ * 4. Al menos un carácter especial (&%$#"!&/()=?, etc.)
+ */
+export function validatePasswordPolicy(password: string): PasswordPolicyResult {
+  const p = password || '';
+  const hasMinLength = p.length >= 8;
+  const hasNumber = /[0-9]/.test(p);
+  const hasUppercase = /[A-Z]/.test(p);
+  // Caracteres especiales requeridos: &%$#"!&/()=? y símbolos auxiliares
+  const hasSpecialChar = /[&%$#"!\/()=?@_*\-+\.,:;~^<>{}[\]|\\]/.test(p);
+
+  const checks = [hasMinLength, hasNumber, hasUppercase, hasSpecialChar];
+  const passedCount = checks.filter(Boolean).length;
+
+  const isValid = hasMinLength && hasNumber && hasUppercase && hasSpecialChar;
+
+  let strengthLabel: PasswordPolicyResult['strengthLabel'] = 'Muy Débil';
+  if (passedCount === 4 && p.length >= 10) {
+    strengthLabel = 'Excelente';
+  } else if (passedCount === 4) {
+    strengthLabel = 'Robusta';
+  } else if (passedCount === 3) {
+    strengthLabel = 'Aceptable';
+  } else if (passedCount >= 1) {
+    strengthLabel = 'Débil';
+  }
+
+  return {
+    isValid,
+    hasMinLength,
+    hasNumber,
+    hasUppercase,
+    hasSpecialChar,
+    strengthScore: passedCount,
+    strengthLabel,
+  };
+}
+
+/**
+ * Determina si el usuario debe cambiar su contraseña obligatoriamente:
+ * - Si tiene la bandera mustChangePassword activa
+ * - O si tiene la clave temporal predeterminada 'M77'
+ * - O si su clave actual no cumple la política de seguridad mínima de 8 caracteres
+ */
+export function isMustChangePassword(professional?: { password?: string; mustChangePassword?: boolean } | null): boolean {
+  if (!professional) return false;
+  if (professional.mustChangePassword === true) return true;
+  if (!professional.password || professional.password === 'M77') return true;
+  const policy = validatePasswordPolicy(professional.password);
+  return !policy.isValid;
+}
+

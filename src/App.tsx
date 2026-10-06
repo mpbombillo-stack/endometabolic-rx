@@ -27,6 +27,8 @@ import { TherapeuticsScreen } from './screens/TherapeuticsScreen';
 import { MonitoringFhirScreen } from './screens/MonitoringFhirScreen';
 
 import { LoginScreen } from './screens/LoginScreen';
+import { ChangePasswordModal } from './components/ChangePasswordModal';
+import { isMustChangePassword } from './utils/authUtils';
 
 const PROFESSIONALS_STORAGE_KEY = 'endometabolic_rx_professionals_v1';
 const ACTIVE_DOCTOR_ID_KEY = 'endometabolic_rx_active_doctor_id';
@@ -85,6 +87,7 @@ export default function App() {
   const [inspectorNode, setInspectorNode] = useState<MatrixNodeDetail | null>(null);
   const [isNewPatientModalOpen, setIsNewPatientModalOpen] = useState<boolean>(false);
   const [evolutionModalPatient, setEvolutionModalPatient] = useState<PatientProfile | null>(null);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Get Active Patient & Active Doctor
@@ -182,6 +185,34 @@ export default function App() {
     setIsAuthenticated(false);
     setCurrentUser(null);
     showToast('Sesión clínica finalizada de forma segura.');
+  };
+
+  const handleSaveNewPassword = (newPassword: string) => {
+    if (!currentUser) return;
+    const updatedUser: MedicalProfessional = {
+      ...currentUser,
+      password: newPassword,
+      mustChangePassword: false,
+    };
+    setCurrentUser(updatedUser);
+
+    const updatedList = professionals.map((p) =>
+      p.id === updatedUser.id ? updatedUser : p
+    );
+    setProfessionals(updatedList);
+
+    try {
+      if (localStorage.getItem(AUTH_SESSION_KEY)) {
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedUser));
+      } else {
+        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedUser));
+      }
+      localStorage.setItem(PROFESSIONALS_STORAGE_KEY, JSON.stringify(updatedList));
+    } catch (e) {}
+
+    saveProfessionalToCloud(updatedUser);
+    setIsChangePasswordOpen(false);
+    showToast('¡Contraseña actualizada exitosamente! Máxima seguridad clínica activada.');
   };
 
   const handleToggleClinicalMode = () => {
@@ -434,6 +465,17 @@ export default function App() {
           onSaveEvolution={handleSaveEvolution}
           professionals={professionals}
           activeDoctorId={activeDoctorId}
+        />
+      )}
+
+      {/* Mandatory / Optional Password Change Modal */}
+      {currentUser && (
+        <ChangePasswordModal
+          isOpen={isMustChangePassword(currentUser) || isChangePasswordOpen}
+          isMandatory={isMustChangePassword(currentUser)}
+          currentUser={currentUser}
+          onSavePassword={handleSaveNewPassword}
+          onClose={() => setIsChangePasswordOpen(false)}
         />
       )}
 

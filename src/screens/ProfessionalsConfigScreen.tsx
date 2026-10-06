@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MedicalProfessional } from '../types';
 import { FunctionalCareLogo } from '../components/FunctionalCareLogo';
-import { generateClinicalUsername } from '../utils/authUtils';
+import { generateClinicalUsername, validatePasswordPolicy } from '../utils/authUtils';
 
 interface ProfessionalsConfigScreenProps {
   professionals: MedicalProfessional[];
@@ -32,6 +32,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
   const [signatureUrl, setSignatureUrl] = useState<string | undefined>(undefined);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<'superadmin' | 'admin' | 'doctor'>('doctor');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -53,6 +54,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
       setSignatureUrl(prof.signatureUrl);
       setUsername(prof.username || (prof.isPrimary ? 'mausugu' : 'doctor'));
       setPassword(prof.password || 'M77');
+      setConfirmPassword(prof.password || 'M77');
       setRole(prof.role || (prof.isPrimary ? 'superadmin' : 'doctor'));
     } else {
       setEditingId(null);
@@ -66,6 +68,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
       setSignatureUrl(undefined);
       setUsername(`dr_${Math.floor(100 + Math.random() * 900)}`);
       setPassword('M77');
+      setConfirmPassword('M77');
       setRole('doctor');
     }
     setShowPassword(false);
@@ -77,6 +80,19 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
     if (!fullName.trim() || !licenseNumber.trim()) {
       onShowToast('Por favor ingrese el nombre y la tarjeta profesional.');
       return;
+    }
+
+    // Si se modifica la contraseña y no es la clave temporal M77, validar política
+    if (password.trim() !== 'M77') {
+      const policy = validatePasswordPolicy(password.trim());
+      if (!policy.isValid) {
+        onShowToast('La contraseña debe tener mínimo 8 caracteres, números, mayúsculas y carácter especial (&%$#"!&/()=?).');
+        return;
+      }
+      if (password.trim() !== confirmPassword.trim()) {
+        onShowToast('Las contraseñas no coinciden. Por favor verifique la confirmación.');
+        return;
+      }
     }
 
     let updatedList: MedicalProfessional[] = [];
@@ -585,6 +601,24 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-3 py-2 text-xs font-mono rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-white text-[#1e1b19]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#1e1b19] mb-1">
+                      Repetir Contraseña *
+                    </label>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Repita contraseña"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`w-full px-3 py-2 text-xs font-mono rounded-lg border focus:ring-2 bg-white text-[#1e1b19] ${
+                        password !== confirmPassword && confirmPassword.length > 0
+                          ? 'border-[#cb2044] focus:ring-[#cb2044]'
+                          : 'border-[#d8d1cd] focus:ring-[#005c55]'
+                      }`}
                     />
                   </div>
 
