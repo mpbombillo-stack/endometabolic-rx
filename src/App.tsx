@@ -309,6 +309,7 @@ export default function App() {
         activeDoctor={activeDoctor}
         onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
         onLogout={handleLogout}
+        onOpenChangePassword={() => setIsChangePasswordOpen(true)}
       />
 
       {/* Persistent Left Clinical Sidebar (Triaje y Cohorte) */}
@@ -322,6 +323,7 @@ export default function App() {
         onOpenNewEvolution={() => setEvolutionModalPatient(activePatient)}
         onOpenDashboard={() => setCurrentTab('patients-dashboard')}
         activeDoctor={activeDoctor}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}

@@ -12,6 +12,7 @@ interface SidebarProps {
   onOpenNewEvolution?: () => void;
   onOpenDashboard?: () => void;
   activeDoctor?: MedicalProfessional;
+  onLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -24,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenNewEvolution,
   onOpenDashboard,
   activeDoctor,
+  onLogout,
 }) => {
   const latestEvo = currentPatient.evolutionHistory[currentPatient.evolutionHistory.length - 1];
   const labs = latestEvo?.labs || {
@@ -168,7 +170,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </span>
             </div>
             <p className="font-bold text-[#1e1b19] leading-tight truncate">{activeDoctor.fullName}</p>
-            <p className="text-[10px] text-[#6e7977]">{activeDoctor.licenseNumber}</p>
+            <p className="text-[10px] text-[#6e7977] flex items-center justify-between mt-0.5">
+              <span>{activeDoctor.licenseNumber}</span>
+              <span className="font-mono text-[#005c55] font-semibold">@{activeDoctor.username || 'mausugu'}</span>
+            </p>
             {activeDoctor.signatureUrl && (
               <div className="mt-1.5 pt-1.5 border-t border-[#f4ece8] flex items-center justify-between">
                 <span className="text-[9px] text-[#005c55] font-semibold flex items-center gap-0.5">
@@ -177,6 +182,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
                 <img src={activeDoctor.signatureUrl} alt="Firma" className="h-5 max-w-[60px] object-contain" />
               </div>
+            )}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="w-full mt-2 py-1.5 px-2 bg-[#cb2044]/10 hover:bg-[#cb2044] text-[#cb2044] hover:text-white rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[14px]">logout</span>
+                <span>Cerrar Sesión</span>
+              </button>
             )}
           </div>
         )}

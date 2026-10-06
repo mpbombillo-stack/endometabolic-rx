@@ -11,6 +11,7 @@ interface HeaderProps {
   activeDoctor?: MedicalProfessional;
   onOpenNewPatientModal: () => void;
   onLogout?: () => void;
+  onOpenChangePassword?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeDoctor,
   onOpenNewPatientModal,
   onLogout,
+  onOpenChangePassword,
 }) => {
   const latestEvo = currentPatient?.evolutionHistory[currentPatient.evolutionHistory.length - 1];
 
@@ -46,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Quick Button to Open New Patient Modal */}
             <button
               onClick={onOpenNewPatientModal}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-[#005c55] hover:bg-[#0f766e] text-white rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#005c55] hover:bg-[#0f766e] text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
               title="Registrar nuevo paciente en el sistema"
             >
               <span className="material-symbols-outlined text-[16px]">person_add</span>
@@ -56,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Clinical Mode Functional vs Conventional Toggle */}
             <button
               onClick={onToggleClinicalMode}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-[#faf2ee] hover:bg-[#f4ece8] rounded-lg text-[#005c55] border border-[#e9e1dd] transition-colors cursor-pointer text-left"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-[#faf2ee] hover:bg-[#f4ece8] rounded-xl text-[#005c55] border border-[#e9e1dd] transition-colors cursor-pointer text-left"
               title="Alternar vista de umbrales funcionales óptimos vs criterios poblacionales convencionales"
             >
               <span
@@ -66,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
               />
               <span className="text-[11px] font-semibold">
                 {clinicalMode
-                  ? 'Modo Clínico: Funcional vs. Convencional Habilitado'
+                  ? 'Modo Clínico: Funcional'
                   : 'Modo Clínico: Convencional'}
               </span>
             </button>
@@ -74,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Active Doctor Badge / Profile */}
             <div
               onClick={() => onTabChange('professionals-config')}
-              className="flex items-center gap-2 px-2.5 py-1 bg-[#faf2ee] hover:bg-[#f4ece8] rounded-lg border border-[#e9e1dd] cursor-pointer transition-colors"
+              className="flex items-center gap-2 px-2.5 py-1 bg-[#faf2ee] hover:bg-[#f4ece8] rounded-xl border border-[#e9e1dd] cursor-pointer transition-colors"
               title="Configuración de especialistas médicos, credenciales y firmas"
             >
               <div className="w-7 h-7 rounded-full bg-[#005c55] text-white flex items-center justify-center font-bold text-xs shadow-sm">
@@ -84,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="hidden xl:flex flex-col text-left">
                 <div className="flex items-center gap-1">
                   <span className="text-[11px] font-bold text-[#1e1b19] leading-tight truncate max-w-[130px]">
-                    {activeDoctor?.fullName || 'Dr. M. Suaza Thorne'}
+                    {activeDoctor?.fullName || 'Dr. M. Suaza Gutiérrez'}
                   </span>
                   <span className="text-[9px] font-mono font-bold text-[#005c55] bg-[#005c55]/10 px-1 rounded">
                     @{activeDoctor?.username || 'mausugu'}
@@ -96,15 +98,27 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
+            {/* Change Password Button */}
+            {onOpenChangePassword && (
+              <button
+                onClick={onOpenChangePassword}
+                className="p-1.5 px-2.5 text-[#005c55] hover:bg-[#005c55]/10 rounded-xl border border-[#005c55]/30 transition-colors cursor-pointer flex items-center gap-1"
+                title="Cambiar contraseña de seguridad"
+              >
+                <span className="material-symbols-outlined text-[16px]">key</span>
+                <span className="hidden xl:inline text-[11px] font-bold">Clave</span>
+              </button>
+            )}
+
             {/* Logout Button */}
             {onLogout && (
               <button
                 onClick={onLogout}
-                className="p-1.5 text-[#6e7977] hover:text-[#cb2044] hover:bg-[#cb2044]/10 rounded-lg border border-[#e9e1dd] transition-colors cursor-pointer flex items-center gap-1"
-                title="Cerrar sesión clínica"
+                className="p-1.5 px-3 bg-[#cb2044]/10 hover:bg-[#cb2044] text-[#cb2044] hover:text-white rounded-xl border border-[#cb2044]/30 transition-all cursor-pointer flex items-center gap-1 shadow-2xs font-semibold"
+                title="Cerrar sesión clínica del especialista"
               >
-                <span className="material-symbols-outlined text-[18px]">logout</span>
-                <span className="hidden md:inline text-[11px] font-bold">Salir</span>
+                <span className="material-symbols-outlined text-[16px]">logout</span>
+                <span className="text-[11.5px] font-bold">Cerrar Sesión</span>
               </button>
             )}
           </div>
