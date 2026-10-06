@@ -8,6 +8,7 @@ import { ScreenTab, PatientProfile, MedicalProfessional, MatrixNodeDetail, Patie
 import { getStoredPatients, savePatients, getStoredActivePatientId, saveActivePatientId } from './data/patientsRegistry';
 import { INITIAL_PROFESSIONALS } from './data/professionalsData';
 import { calculateSurrogates } from './utils/metabolicCalculators';
+import { fetchProfessionalsFromCloud, fetchPatientsFromCloud, savePatientToCloud, saveProfessionalToCloud } from './services/cloudSyncService';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { FhirModal } from './components/FhirModal';
@@ -89,6 +90,27 @@ export default function App() {
     }, 3400);
   };
 
+  // Cloud Supabase Sync on Mount
+  useEffect(() => {
+    async function loadCloudData() {
+      const [cloudDocs, cloudPatients] = await Promise.all([
+        fetchProfessionalsFromCloud(),
+        fetchPatientsFromCloud(),
+      ]);
+
+      if (cloudDocs && cloudDocs.length > 0) {
+        setProfessionals(cloudDocs);
+      }
+      if (cloudPatients && cloudPatients.length > 0) {
+        setPatients(cloudPatients);
+        if (!cloudPatients.some((p) => p.id === activePatientId)) {
+          setActivePatientId(cloudPatients[0].id);
+        }
+      }
+    }
+    loadCloudData();
+  }, []);
+
   // Sync to storage
   useEffect(() => {
     savePatients(patients);
@@ -127,17 +149,20 @@ export default function App() {
     const updated = [newPatient, ...patients];
     setPatients(updated);
     setActivePatientId(newPatient.id);
+    savePatientToCloud(newPatient);
     showToast(`¡Paciente ${newPatient.fullName} (${newPatient.mrn}) registrado con éxito!`);
   };
 
   const handleSaveEvolution = (patientId: string, newEvolution: PatientEvolution) => {
     const updated = patients.map((p) => {
       if (p.id === patientId) {
-        return {
+        const updatedPatient = {
           ...p,
           evolutionHistory: [...p.evolutionHistory, newEvolution],
           currentProtocol: newEvolution.activeProtocol || p.currentProtocol,
         };
+        savePatientToCloud(updatedPatient);
+        return updatedPatient;
       }
       return p;
     });
@@ -283,7 +308,10 @@ export default function App() {
           {currentTab === 'professionals-config' && (
             <ProfessionalsConfigScreen
               professionals={professionals}
-              onUpdateProfessionals={(updated) => setProfessionals(updated)}
+              onUpdateProfessionals={(updated) => {
+                setProfessionals(updated);
+                updated.forEach((doc) => saveProfessionalToCloud(doc));
+              }}
               activeDoctorId={activeDoctorId}
               onSelectActiveDoctor={(id) => setActiveDoctorId(id)}
               onShowToast={showToast}
