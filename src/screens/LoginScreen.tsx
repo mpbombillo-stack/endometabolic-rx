@@ -53,11 +53,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
     }, 400);
   };
 
-  const handleQuickSuperUserLogin = () => {
-    setUsername('mausugu');
-    setPassword('M77');
-    setErrorMessage(null);
-  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#003833] via-[#005c55] to-[#0a2e2b] flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -183,38 +178,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
             </button>
           </form>
 
-          {/* Fast Access Demo / Seed Superuser Badge */}
-          <div className="mt-6 pt-5 border-t border-[#f4ece8] bg-[#faf2ee]/70 -mx-8 -mb-8 p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#6e7977] flex items-center gap-1 font-mono">
-                <span className="material-symbols-outlined text-[13px] text-[#005c55]">admin_panel_settings</span>
-                Super Usuario Predeterminado
-              </span>
-              <button
-                type="button"
-                onClick={handleQuickSuperUserLogin}
-                className="text-[10px] text-[#005c55] hover:text-[#004742] font-bold bg-white px-2 py-0.5 rounded border border-[#005c55]/30 shadow-xs hover:bg-[#005c55]/5 transition-colors cursor-pointer"
-              >
-                Autocompletar
-              </button>
-            </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-white p-2.5 rounded-xl border border-[#e9e1dd] text-[#3e4947]">
-              <div>
-                <span className="text-[9.5px] text-[#6e7977] block">Login:</span>
-                <span className="font-bold text-[#005c55]">mausugu</span>
-              </div>
-              <div>
-                <span className="text-[9.5px] text-[#6e7977] block">Contraseña:</span>
-                <span className="font-bold text-[#005c55]">M77</span>
-              </div>
-            </div>
-
-            <p className="text-[10px] text-[#8a9694] text-center mt-3 flex items-center justify-center gap-1">
-              <span className="material-symbols-outlined text-[12px]">security</span>
-              <span>Regla (3+2+2): 3 letras nombre + 2 letras 1er apellido + 2 letras 2do apellido (ej. mausugu).</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
