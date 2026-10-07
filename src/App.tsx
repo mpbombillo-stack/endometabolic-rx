@@ -8,6 +8,7 @@ import { ScreenTab, PatientProfile, MedicalProfessional, MatrixNodeDetail, Patie
 import { getStoredPatients, savePatients, getStoredActivePatientId, saveActivePatientId } from './data/patientsRegistry';
 import { INITIAL_PROFESSIONALS } from './data/professionalsData';
 import { calculateSurrogates } from './utils/metabolicCalculators';
+import { generateClinicalUsername, isMustChangePassword } from './utils/authUtils';
 import { fetchProfessionalsFromCloud, fetchPatientsFromCloud, savePatientToCloud, saveProfessionalToCloud } from './services/cloudSyncService';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -28,7 +29,6 @@ import { MonitoringFhirScreen } from './screens/MonitoringFhirScreen';
 
 import { LoginScreen } from './screens/LoginScreen';
 import { ChangePasswordModal } from './components/ChangePasswordModal';
-import { isMustChangePassword } from './utils/authUtils';
 
 const PROFESSIONALS_STORAGE_KEY = 'endometabolic_rx_professionals_v1';
 const ACTIVE_DOCTOR_ID_KEY = 'endometabolic_rx_active_doctor_id';
@@ -119,19 +119,57 @@ export default function App() {
   // Cloud Supabase Sync on Mount
   useEffect(() => {
     async function loadCloudData() {
-      const [cloudDocs, cloudPatients] = await Promise.all([
-        fetchProfessionalsFromCloud(),
-        fetchPatientsFromCloud(),
-      ]);
+      try {
+        const [cloudDocs, cloudPatients] = await Promise.all([
+          fetchProfessionalsFromCloud(),
+          fetchPatientsFromCloud(),
+        ]);
 
-      if (cloudDocs && cloudDocs.length > 0) {
-        setProfessionals(cloudDocs);
-      }
-      if (cloudPatients && cloudPatients.length > 0) {
-        setPatients(cloudPatients);
-        if (!cloudPatients.some((p) => p.id === activePatientId)) {
-          setActivePatientId(cloudPatients[0].id);
+        if (cloudDocs && cloudDocs.length > 0) {
+          setProfessionals((currentLocalDocs) => {
+            // Combinar registros en la nube con las personalizaciones locales de credenciales
+            const merged = cloudDocs.map((cDoc) => {
+              const localMatch = currentLocalDocs.find((l) => l.id === cDoc.id);
+              return {
+                ...cDoc,
+                fullName: localMatch?.fullName || cDoc.fullName,
+                title: localMatch?.title || cDoc.title,
+                specialty: localMatch?.specialty || cDoc.specialty,
+                licenseNumber: localMatch?.licenseNumber || cDoc.licenseNumber,
+                institution: localMatch?.institution || cDoc.institution,
+                signatureUrl: localMatch?.signatureUrl || cDoc.signatureUrl,
+                username: localMatch?.username || cDoc.username || generateClinicalUsername(cDoc.fullName),
+                password: localMatch?.password || cDoc.password || '123456',
+                role: localMatch?.role || cDoc.role || 'doctor',
+                mustChangePassword: localMatch?.mustChangePassword ?? cDoc.mustChangePassword,
+              };
+            });
+
+            // Conservar doctores agregados localmente que no estén aún en la nube
+            currentLocalDocs.forEach((localDoc) => {
+              if (!merged.some((m) => m.id === localDoc.id)) {
+                merged.push(localDoc);
+              }
+            });
+
+            return merged;
+          });
         }
+
+        if (cloudPatients && cloudPatients.length > 0) {
+          setPatients((currentLocalPatients) => {
+            // Si hay pacientes creados localmente, conservarlos
+            const mergedPatients = [...cloudPatients];
+            currentLocalPatients.forEach((lp) => {
+              if (!mergedPatients.some((cp) => cp.id === lp.id)) {
+                mergedPatients.push(lp);
+              }
+            });
+            return mergedPatients;
+          });
+        }
+      } catch (err) {
+        console.warn('[Sync] Error sincronizando datos remotos:', err);
       }
     }
     loadCloudData();

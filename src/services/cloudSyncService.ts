@@ -50,6 +50,7 @@ export async function saveProfessionalToCloud(doc: MedicalProfessional): Promise
   if (!isSupabaseConfigured || !supabase) return false;
 
   try {
+    // 1. Intentar upsert completo con campos de credenciales y roles
     const { error } = await supabase.from('medical_professionals').upsert({
       id: doc.id,
       full_name: doc.fullName,
@@ -65,15 +66,34 @@ export async function saveProfessionalToCloud(doc: MedicalProfessional): Promise
       username: doc.username,
       password: doc.password,
       role: doc.role,
+      must_change_password: doc.mustChangePassword,
     });
 
-    if (error) {
-      console.warn('[Supabase] Upsert doctor error:', error.message);
+    if (!error) return true;
+
+    // 2. Si falló por falta de columnas en Supabase (ej. error de esquema cache), reintentar con columnas base
+    console.warn('[Supabase] Guardado con campos avanzados no disponible en el esquema actual, reintentando con columnas base:', error.message);
+    const { error: coreError } = await supabase.from('medical_professionals').upsert({
+      id: doc.id,
+      full_name: doc.fullName,
+      title: doc.title,
+      specialty: doc.specialty,
+      license_number: doc.licenseNumber,
+      institution: doc.institution,
+      email: doc.email,
+      phone: doc.phone,
+      signature_url: doc.signatureUrl,
+      is_primary: doc.isPrimary,
+      registered_at: doc.registeredAt,
+    });
+
+    if (coreError) {
+      console.warn('[Supabase] Error en guardado base:', coreError.message);
       return false;
     }
     return true;
   } catch (e) {
-    console.warn('[Supabase] Upsert error:', e);
+    console.warn('[Supabase] Excepción en guardado:', e);
     return false;
   }
 }

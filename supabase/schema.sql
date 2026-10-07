@@ -18,10 +18,17 @@ CREATE TABLE IF NOT EXISTS public.medical_professionals (
     signature_url TEXT,
     is_primary BOOLEAN DEFAULT FALSE,
     username TEXT UNIQUE,
-    password TEXT DEFAULT 'M77',
+    password TEXT DEFAULT '123456',
     role TEXT DEFAULT 'doctor',
+    must_change_password BOOLEAN DEFAULT TRUE,
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Asegurar columnas si la tabla ya existía previamente
+ALTER TABLE public.medical_professionals ADD COLUMN IF NOT EXISTS username TEXT;
+ALTER TABLE public.medical_professionals ADD COLUMN IF NOT EXISTS password TEXT DEFAULT '123456';
+ALTER TABLE public.medical_professionals ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'doctor';
+ALTER TABLE public.medical_professionals ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN DEFAULT TRUE;
 
 -- 3. TABLA: EXPEDIENTE DE PACIENTES
 CREATE TABLE IF NOT EXISTS public.patients (
