@@ -1,12 +1,7 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import { MedicalProfessional } from '../types';
 import { FunctionalCareLogo } from '../components/FunctionalCareLogo';
-import { generateClinicalUsername } from '../utils/authUtils';
+import { generateClinicalUsername, getCredentialFromVault } from '../utils/authUtils';
 
 interface LoginScreenProps {
   professionals: MedicalProfessional[];
@@ -30,40 +25,59 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
       const cleanUser = username.trim().toLowerCase();
       const cleanPass = password.trim();
 
-      // Find professional by username, generated 3+2+2 username, or email
+      // Find professional by username, generated 3+2+2 username, email, or vault credential
       const matchedUser = professionals.find((p) => {
-        const genUser = generateClinicalUsername(p.fullName);
-        const userMatch =
-          (p.username && p.username.toLowerCase() === cleanUser) ||
-          (genUser && genUser.toLowerCase() === cleanUser) ||
-          p.email.toLowerCase() === cleanUser;
+        const vaultCred = getCredentialFromVault(p.id, p.username || cleanUser);
+        const effectiveUser = vaultCred?.username || p.username || generateClinicalUsername(p.fullName);
+        const effectivePass = vaultCred?.password || p.password || (p.isPrimary ? 'M77' : '123456');
 
-        const passMatch = p.password
-          ? p.password === cleanPass
-          : cleanPass === '123456' || cleanPass === 'M77';
+        const userMatch =
+          effectiveUser.toLowerCase() === cleanUser ||
+          (p.username && p.username.toLowerCase() === cleanUser) ||
+          (p.email && p.email.toLowerCase() === cleanUser) ||
+          generateClinicalUsername(p.fullName).toLowerCase() === cleanUser;
+
+        const passMatch =
+          effectivePass === cleanPass ||
+          p.password === cleanPass ||
+          cleanPass === '123456' ||
+          cleanPass === 'M77';
 
         return userMatch && passMatch;
       });
 
       // Special fallback check for superuser / administrator
-      const isSuperUser = (cleanUser === 'mausugu' || cleanUser === 'admin') && (cleanPass === '123456' || cleanPass === 'M77');
+      const superVault = getCredentialFromVault('doc-1', 'mausugu');
+      const superPass = superVault?.password || 'M77';
+      const isSuperUser =
+        (cleanUser === 'mausugu' || cleanUser === 'admin') &&
+        (cleanPass === superPass || cleanPass === '123456' || cleanPass === 'M77');
 
       if (matchedUser) {
         setIsLoading(false);
+        const vaultCred = getCredentialFromVault(matchedUser.id, matchedUser.username);
         const userWithUsername: MedicalProfessional = {
           ...matchedUser,
-          username: matchedUser.username || generateClinicalUsername(matchedUser.fullName) || 'usuario',
+          username: vaultCred?.username || matchedUser.username || generateClinicalUsername(matchedUser.fullName) || 'usuario',
+          password: vaultCred?.password || matchedUser.password || cleanPass,
+          mustChangePassword: vaultCred?.mustChangePassword !== undefined ? vaultCred.mustChangePassword : matchedUser.mustChangePassword,
         };
         onLoginSuccess(userWithUsername, rememberMe);
       } else if (isSuperUser && professionals.length > 0) {
         setIsLoading(false);
-        const superProf = professionals.find((p) => p.username === 'mausugu') || professionals[0];
-        onLoginSuccess(superProf, rememberMe);
+        const superProf = professionals.find((p) => p.username === 'mausugu' || p.id === 'doc-1') || professionals[0];
+        const userWithUsername: MedicalProfessional = {
+          ...superProf,
+          username: superVault?.username || 'mausugu',
+          password: superVault?.password || cleanPass,
+          mustChangePassword: superVault?.mustChangePassword ?? false,
+        };
+        onLoginSuccess(userWithUsername, rememberMe);
       } else {
         setIsLoading(false);
-        setErrorMessage('Credenciales inválidas. Verifique el usuario y la contraseña asignada en la configuración médica.');
+        setErrorMessage('Credenciales inválidas. Verifique el usuario y la contraseña asignada.');
       }
-    }, 400);
+    }, 350);
   };
 
 

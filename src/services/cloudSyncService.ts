@@ -5,7 +5,7 @@
 
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { PatientProfile, MedicalProfessional, PatientEvolution } from '../types';
-import { generateClinicalUsername } from '../utils/authUtils';
+import { generateClinicalUsername, getCredentialFromVault, saveCredentialToVault } from '../utils/authUtils';
 
 export async function fetchProfessionalsFromCloud(): Promise<MedicalProfessional[] | null> {
   if (!isSupabaseConfigured || !supabase) return null;
@@ -22,23 +22,35 @@ export async function fetchProfessionalsFromCloud(): Promise<MedicalProfessional
     }
 
     if (data && data.length > 0) {
-      return data.map((doc: any) => ({
-        id: doc.id,
-        fullName: doc.full_name,
-        title: doc.title,
-        specialty: doc.specialty,
-        licenseNumber: doc.license_number,
-        institution: doc.institution,
-        email: doc.email,
-        phone: doc.phone,
-        signatureUrl: doc.signature_url,
-        isPrimary: doc.is_primary,
-        registeredAt: doc.registered_at,
-        username: doc.username || generateClinicalUsername(doc.full_name) || (doc.is_primary ? 'mausugu' : 'usuario'),
-        password: doc.password || '123456',
-        role: doc.role || (doc.is_primary ? 'superadmin' : 'doctor'),
-        mustChangePassword: doc.must_change_password ?? (doc.password === '123456' || doc.password === 'M77'),
-      }));
+      return data.map((doc: any) => {
+        const isPrimaryDoc = doc.is_primary || doc.id === 'doc-1';
+        const defaultName = isPrimaryDoc ? 'Dr. Mauricio Suaza Gutiérrez, MD, IFMCP' : doc.full_name;
+        const defaultUsername = isPrimaryDoc ? 'mausugu' : (doc.username || generateClinicalUsername(doc.full_name) || 'usuario');
+        const defaultPassword = isPrimaryDoc ? 'M77' : '123456';
+
+        // Recuperar credencial asegurada del vault local si existe
+        const vaultCred = getCredentialFromVault(doc.id, defaultUsername);
+
+        return {
+          id: doc.id,
+          fullName: vaultCred?.fullName || defaultName,
+          title: doc.title,
+          specialty: doc.specialty,
+          licenseNumber: doc.license_number,
+          institution: doc.institution,
+          email: doc.email,
+          phone: doc.phone,
+          signatureUrl: doc.signature_url,
+          isPrimary: isPrimaryDoc,
+          registeredAt: doc.registered_at,
+          username: vaultCred?.username || defaultUsername,
+          password: vaultCred?.password || doc.password || defaultPassword,
+          role: (vaultCred?.role || doc.role || (isPrimaryDoc ? 'superadmin' : 'doctor')) as any,
+          mustChangePassword: vaultCred?.mustChangePassword !== undefined
+            ? vaultCred.mustChangePassword
+            : (doc.must_change_password ?? (doc.password === '123456' || doc.password === 'M77' || !isPrimaryDoc)),
+        };
+      });
     }
   } catch (e) {
     console.warn('[Supabase] Fetch error:', e);
@@ -47,7 +59,16 @@ export async function fetchProfessionalsFromCloud(): Promise<MedicalProfessional
 }
 
 export async function saveProfessionalToCloud(doc: MedicalProfessional): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  // Asegurar siempre en el vault local inmediatamente
+  saveCredentialToVault(doc.id, {
+    username: doc.username,
+    password: doc.password,
+    mustChangePassword: doc.mustChangePassword,
+    role: doc.role,
+    fullName: doc.fullName,
+  });
+
+  if (!isSupabaseConfigured || !supabase) return true;
 
   try {
     // 1. Intentar upsert completo con campos de credenciales y roles

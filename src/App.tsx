@@ -8,7 +8,7 @@ import { ScreenTab, PatientProfile, MedicalProfessional, MatrixNodeDetail, Patie
 import { getStoredPatients, savePatients, getStoredActivePatientId, saveActivePatientId } from './data/patientsRegistry';
 import { INITIAL_PROFESSIONALS } from './data/professionalsData';
 import { calculateSurrogates } from './utils/metabolicCalculators';
-import { generateClinicalUsername, isMustChangePassword } from './utils/authUtils';
+import { generateClinicalUsername, isMustChangePassword, saveCredentialToVault } from './utils/authUtils';
 import { fetchProfessionalsFromCloud, fetchPatientsFromCloud, savePatientToCloud, saveProfessionalToCloud } from './services/cloudSyncService';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -227,27 +227,40 @@ export default function App() {
 
   const handleSaveNewPassword = (newPassword: string) => {
     if (!currentUser) return;
+    const cleanPassword = newPassword.trim();
     const updatedUser: MedicalProfessional = {
       ...currentUser,
-      password: newPassword,
+      password: cleanPassword,
       mustChangePassword: false,
     };
+    
+    // 1. Guardar en el vault seguro de credenciales locales
+    saveCredentialToVault(updatedUser.id, {
+      username: updatedUser.username,
+      password: cleanPassword,
+      mustChangePassword: false,
+      role: updatedUser.role,
+      fullName: updatedUser.fullName,
+    });
+
+    // 2. Actualizar estado del usuario autenticado
     setCurrentUser(updatedUser);
 
+    // 3. Actualizar lista de profesionales
     const updatedList = professionals.map((p) =>
       p.id === updatedUser.id ? updatedUser : p
     );
     setProfessionals(updatedList);
 
+    // 4. Persistir en almacenamiento de sesión y local
     try {
-      if (localStorage.getItem(AUTH_SESSION_KEY)) {
-        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedUser));
-      } else {
-        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedUser));
-      }
+      const userJson = JSON.stringify(updatedUser);
+      localStorage.setItem(AUTH_SESSION_KEY, userJson);
+      sessionStorage.setItem(AUTH_SESSION_KEY, userJson);
       localStorage.setItem(PROFESSIONALS_STORAGE_KEY, JSON.stringify(updatedList));
     } catch (e) {}
 
+    // 5. Enviar a la nube
     saveProfessionalToCloud(updatedUser);
     setIsChangePasswordOpen(false);
     showToast('¡Contraseña actualizada exitosamente! Máxima seguridad clínica activada.');

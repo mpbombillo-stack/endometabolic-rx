@@ -122,3 +122,57 @@ export function isMustChangePassword(professional?: { password?: string; mustCha
   return !policy.isValid;
 }
 
+export const CREDENTIALS_VAULT_KEY = 'endometabolic_rx_credentials_vault_v1';
+
+export interface StoredCredential {
+  username?: string;
+  password?: string;
+  mustChangePassword?: boolean;
+  role?: string;
+  fullName?: string;
+}
+
+export function getCredentialsVault(): Record<string, StoredCredential> {
+  try {
+    const raw = localStorage.getItem(CREDENTIALS_VAULT_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (e) {}
+  return {};
+}
+
+export function saveCredentialToVault(
+  docId: string,
+  credential: Partial<StoredCredential>
+) {
+  try {
+    const vault = getCredentialsVault();
+    vault[docId] = {
+      ...(vault[docId] || {}),
+      ...credential,
+    };
+    if (credential.username) {
+      vault[`user_${credential.username.toLowerCase()}`] = {
+        ...(vault[`user_${credential.username.toLowerCase()}`] || {}),
+        ...credential,
+      };
+    }
+    localStorage.setItem(CREDENTIALS_VAULT_KEY, JSON.stringify(vault));
+  } catch (e) {}
+}
+
+export function getCredentialFromVault(
+  docId: string,
+  username?: string
+): StoredCredential | null {
+  try {
+    const vault = getCredentialsVault();
+    if (vault[docId]) return vault[docId];
+    if (username && vault[`user_${username.toLowerCase()}`]) {
+      return vault[`user_${username.toLowerCase()}`];
+    }
+  } catch (e) {}
+  return null;
+}
+
