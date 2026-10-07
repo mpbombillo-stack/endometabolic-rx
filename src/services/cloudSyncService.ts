@@ -119,6 +119,20 @@ export async function saveProfessionalToCloud(doc: MedicalProfessional): Promise
   }
 }
 
+export async function deleteProfessionalFromCloud(id: string): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return true;
+  try {
+    const { error } = await supabase.from('medical_professionals').delete().eq('id', id);
+    if (error) {
+      console.warn('[Supabase] Error eliminando doctor:', error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function fetchPatientsFromCloud(): Promise<PatientProfile[] | null> {
   if (!isSupabaseConfigured || !supabase) return null;
 

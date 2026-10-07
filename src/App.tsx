@@ -9,7 +9,7 @@ import { getStoredPatients, savePatients, getStoredActivePatientId, saveActivePa
 import { INITIAL_PROFESSIONALS } from './data/professionalsData';
 import { calculateSurrogates } from './utils/metabolicCalculators';
 import { generateClinicalUsername, isMustChangePassword, saveCredentialToVault } from './utils/authUtils';
-import { fetchProfessionalsFromCloud, fetchPatientsFromCloud, savePatientToCloud, saveProfessionalToCloud } from './services/cloudSyncService';
+import { fetchProfessionalsFromCloud, fetchPatientsFromCloud, savePatientToCloud, saveProfessionalToCloud, deleteProfessionalFromCloud } from './services/cloudSyncService';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { FhirModal } from './components/FhirModal';
@@ -459,21 +459,38 @@ export default function App() {
             <ProfessionalsConfigScreen
               professionals={professionals}
               onUpdateProfessionals={(updated) => {
+                const previousIds = professionals.map((p) => p.id);
+                const currentIds = updated.map((p) => p.id);
+                const removedIds = previousIds.filter((id) => !currentIds.includes(id));
+
+                // 1. Guardar de inmediato en estado y localStorage
                 setProfessionals(updated);
+                try {
+                  localStorage.setItem(PROFESSIONALS_STORAGE_KEY, JSON.stringify(updated));
+                } catch (e) {}
+
+                // 2. Si el usuario actual fue editado, actualizar sesión activa
                 if (currentUser) {
                   const updatedCurrent = updated.find((u) => u.id === currentUser.id);
                   if (updatedCurrent) {
                     setCurrentUser(updatedCurrent);
                     try {
-                      if (localStorage.getItem(AUTH_SESSION_KEY)) {
-                        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedCurrent));
-                      } else {
-                        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(updatedCurrent));
-                      }
+                      const userJson = JSON.stringify(updatedCurrent);
+                      localStorage.setItem(AUTH_SESSION_KEY, userJson);
+                      sessionStorage.setItem(AUTH_SESSION_KEY, userJson);
                     } catch (e) {}
                   }
                 }
-                updated.forEach((doc) => saveProfessionalToCloud(doc));
+
+                // 3. Sincronizar inserciones y actualizaciones en la nube
+                updated.forEach((doc) => {
+                  saveProfessionalToCloud(doc);
+                });
+
+                // 4. Eliminar en la nube si se borró algún médico
+                removedIds.forEach((id) => {
+                  deleteProfessionalFromCloud(id);
+                });
               }}
               activeDoctorId={activeDoctorId}
               onSelectActiveDoctor={(id) => setActiveDoctorId(id)}
