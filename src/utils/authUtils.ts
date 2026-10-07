@@ -106,16 +106,18 @@ export function validatePasswordPolicy(password: string): PasswordPolicyResult {
   };
 }
 
+export const DEFAULT_INITIAL_PASSWORD = '123456';
+
 /**
  * Determina si el usuario debe cambiar su contraseña obligatoriamente:
  * - Si tiene la bandera mustChangePassword activa
- * - O si tiene la clave temporal predeterminada 'M77'
+ * - O si tiene la clave inicial predeterminada '123456' o 'M77'
  * - O si su clave actual no cumple la política de seguridad mínima de 8 caracteres
  */
 export function isMustChangePassword(professional?: { password?: string; mustChangePassword?: boolean } | null): boolean {
   if (!professional) return false;
   if (professional.mustChangePassword === true) return true;
-  if (!professional.password || professional.password === 'M77') return true;
+  if (!professional.password || professional.password === '123456' || professional.password === 'M77') return true;
   const policy = validatePasswordPolicy(professional.password);
   return !policy.isValid;
 }

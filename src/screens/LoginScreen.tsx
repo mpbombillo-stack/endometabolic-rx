@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { MedicalProfessional } from '../types';
 import { FunctionalCareLogo } from '../components/FunctionalCareLogo';
+import { generateClinicalUsername } from '../utils/authUtils';
 
 interface LoginScreenProps {
   professionals: MedicalProfessional[];
@@ -29,19 +30,31 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
       const cleanUser = username.trim().toLowerCase();
       const cleanPass = password.trim();
 
-      // Find professional by username or email
+      // Find professional by username, generated 3+2+2 username, or email
       const matchedUser = professionals.find((p) => {
-        const userMatch = (p.username && p.username.toLowerCase() === cleanUser) || p.email.toLowerCase() === cleanUser;
-        const passMatch = p.password ? p.password === cleanPass : cleanPass === 'M77';
+        const genUser = generateClinicalUsername(p.fullName);
+        const userMatch =
+          (p.username && p.username.toLowerCase() === cleanUser) ||
+          (genUser && genUser.toLowerCase() === cleanUser) ||
+          p.email.toLowerCase() === cleanUser;
+
+        const passMatch = p.password
+          ? p.password === cleanPass
+          : cleanPass === '123456' || cleanPass === 'M77';
+
         return userMatch && passMatch;
       });
 
-      // Special fallback check for superuser mausugu
-      const isSuperUser = (cleanUser === 'mausugu' || cleanUser === 'admin') && cleanPass === 'M77';
+      // Special fallback check for superuser / administrator
+      const isSuperUser = (cleanUser === 'mausugu' || cleanUser === 'admin') && (cleanPass === '123456' || cleanPass === 'M77');
 
       if (matchedUser) {
         setIsLoading(false);
-        onLoginSuccess(matchedUser, rememberMe);
+        const userWithUsername: MedicalProfessional = {
+          ...matchedUser,
+          username: matchedUser.username || generateClinicalUsername(matchedUser.fullName) || 'usuario',
+        };
+        onLoginSuccess(userWithUsername, rememberMe);
       } else if (isSuperUser && professionals.length > 0) {
         setIsLoading(false);
         const superProf = professionals.find((p) => p.username === 'mausugu') || professionals[0];

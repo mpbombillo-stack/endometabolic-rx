@@ -43,13 +43,14 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
     setErrorMessage(null);
 
     // Validate current password if provided
-    if (currentUser.password && currentPasswordInput.trim() !== currentUser.password && currentPasswordInput.trim() !== 'M77') {
+    const isTempPass = currentPasswordInput.trim() === '123456' || currentPasswordInput.trim() === 'M77';
+    if (currentUser.password && currentPasswordInput.trim() !== currentUser.password && !isTempPass) {
       setErrorMessage('La contraseña actual ingresada es incorrecta.');
       return;
     }
 
     if (!policy.isValid) {
-      setErrorMessage('La nueva contraseña debe cumplir con todos los requisitos de seguridad clínica.');
+      setErrorMessage('La nueva contraseña debe cumplir con todos los requisitos de seguridad clínica (mínimo 8 caracteres, números, mayúsculas y símbolo especial).');
       return;
     }
 
@@ -58,8 +59,8 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
       return;
     }
 
-    if (newPassword === 'M77' || newPassword === currentUser.password) {
-      setErrorMessage('La nueva contraseña debe ser diferente a la contraseña temporal predeterminada.');
+    if (newPassword === '123456' || newPassword === 'M77' || (currentUser.password && newPassword === currentUser.password)) {
+      setErrorMessage('La nueva contraseña debe ser diferente a la contraseña temporal o inicial predeterminada.');
       return;
     }
 
@@ -127,12 +128,12 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
           <div>
             <label className="block text-xs font-bold text-[#1e1b19] mb-1.5 flex items-center justify-between">
               <span>Contraseña Temporal / Actual *</span>
-              <span className="text-[10px] font-mono text-[#6e7977]">Clave de inicio (ej. M77)</span>
+              <span className="text-[10px] font-mono text-[#6e7977]">Clave de inicio (ej. 123456)</span>
             </label>
             <input
               type="password"
               required
-              placeholder="Ingrese su contraseña actual o temporal (ej. M77)"
+              placeholder="Ingrese su contraseña actual o temporal (ej. 123456)"
               value={currentPasswordInput}
               onChange={(e) => setCurrentPasswordInput(e.target.value)}
               className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#d8d1cd] bg-[#fff8f5] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#005c55] text-[#1e1b19] font-mono"

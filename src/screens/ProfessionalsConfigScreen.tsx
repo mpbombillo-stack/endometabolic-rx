@@ -52,9 +52,9 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
       setEmail(prof.email);
       setPhone(prof.phone);
       setSignatureUrl(prof.signatureUrl);
-      setUsername(prof.username || (prof.isPrimary ? 'mausugu' : 'doctor'));
-      setPassword(prof.password || 'M77');
-      setConfirmPassword(prof.password || 'M77');
+      setUsername(prof.username || generateClinicalUsername(prof.fullName) || '');
+      setPassword(prof.password || '123456');
+      setConfirmPassword(prof.password || '123456');
       setRole(prof.role || (prof.isPrimary ? 'superadmin' : 'doctor'));
     } else {
       setEditingId(null);
@@ -66,9 +66,9 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
       setEmail('');
       setPhone('');
       setSignatureUrl(undefined);
-      setUsername(`dr_${Math.floor(100 + Math.random() * 900)}`);
-      setPassword('M77');
-      setConfirmPassword('M77');
+      setUsername('');
+      setPassword('123456');
+      setConfirmPassword('123456');
       setRole('doctor');
     }
     setShowPassword(false);
@@ -78,18 +78,22 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !licenseNumber.trim()) {
-      onShowToast('Por favor ingrese el nombre y la tarjeta profesional.');
+      onShowToast('Por favor ingrese el nombre y la matrícula / tarjeta profesional.');
       return;
     }
 
-    // Si se modifica la contraseña y no es la clave temporal M77, validar política
-    if (password.trim() !== 'M77') {
-      const policy = validatePasswordPolicy(password.trim());
+    const calculatedUser = username.trim().toLowerCase() || generateClinicalUsername(fullName.trim()) || 'usuario';
+    const assignedPassword = password.trim() || '123456';
+    const isTempPassword = assignedPassword === '123456' || assignedPassword === 'M77';
+
+    // Si se asigna una contraseña definitiva (diferente a 123456 o M77), validar política de seguridad
+    if (!isTempPassword) {
+      const policy = validatePasswordPolicy(assignedPassword);
       if (!policy.isValid) {
-        onShowToast('La contraseña debe tener mínimo 8 caracteres, números, mayúsculas y carácter especial (&%$#"!&/()=?).');
+        onShowToast('La contraseña personalizada debe tener mínimo 8 caracteres, números, mayúsculas y carácter especial (&%$#"!&/()=?).');
         return;
       }
-      if (password.trim() !== confirmPassword.trim()) {
+      if (assignedPassword !== confirmPassword.trim()) {
         onShowToast('Las contraseñas no coinciden. Por favor verifique la confirmación.');
         return;
       }
@@ -110,13 +114,14 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
               email: email.trim(),
               phone: phone.trim(),
               signatureUrl,
-              username: username.trim().toLowerCase(),
-              password: password.trim(),
+              username: calculatedUser,
+              password: assignedPassword,
               role,
+              mustChangePassword: isTempPassword ? true : (p.mustChangePassword ?? false),
             }
           : p
       );
-      onShowToast(`Perfil del ${fullName} y credenciales actualizados con éxito.`);
+      onShowToast(`Perfil del ${fullName} actualizado con usuario @${calculatedUser}.`);
     } else {
       const newProf: MedicalProfessional = {
         id: `doc-${Date.now()}`,
@@ -130,12 +135,13 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
         signatureUrl,
         isPrimary: professionals.length === 0,
         registeredAt: new Date().toISOString().split('T')[0],
-        username: username.trim().toLowerCase() || `user_${Date.now().toString().slice(-4)}`,
-        password: password.trim() || 'M77',
+        username: calculatedUser,
+        password: assignedPassword,
         role: role || (professionals.length === 0 ? 'superadmin' : 'doctor'),
+        mustChangePassword: true, // Siempre exige cambio en el primer inicio con clave inicial
       };
       updatedList = [...professionals, newProf];
-      onShowToast(`Profesional ${fullName} registrado exitosamente con usuario @${newProf.username}.`);
+      onShowToast(`Especialista ${fullName} registrado con éxito. Usuario: @${newProf.username} | Clave inicial: ${newProf.password}`);
     }
 
     onUpdateProfessionals(updatedList);
@@ -312,7 +318,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                     <span className="text-[#6e7977]">Usuario / Login:</span>
                     <span className="font-mono font-bold text-[#005c55] bg-[#005c55]/10 px-1.5 py-0.5 rounded border border-[#005c55]/20 flex items-center gap-1">
                       <span className="material-symbols-outlined text-[12px]">badge</span>
-                      @{prof.username || 'mausugu'}
+                      @{prof.username || generateClinicalUsername(prof.fullName) || 'usuario'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -541,7 +547,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                     Credenciales de Acceso al Sistema
                   </span>
                   <span className="text-[10px] font-mono text-[#005c55] bg-[#005c55]/10 px-2 py-0.5 rounded font-bold">
-                    Parametrización de Usuario
+                    Contraseña Inicial: 123456
                   </span>
                 </div>
 
@@ -562,7 +568,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                             onShowToast('Ingrese primero el nombre completo para aplicar la regla.');
                           }
                         }}
-                        className="text-[10px] text-[#005c55] hover:text-[#004742] font-semibold flex items-center gap-0.5 cursor-pointer"
+                        className="text-[10px] text-[#005c55] hover:text-[#004742] font-semibold flex items-center gap-0.5 cursor-pointer bg-white px-1.5 py-0.5 rounded border border-[#005c55]/30 shadow-xs"
                         title="Aplicar regla: 3 letras nombre + 2 letras 1er apellido + 2 letras 2do apellido"
                       >
                         <span className="material-symbols-outlined text-[12px]">auto_fix_high</span>
@@ -573,7 +579,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                       <input
                         type="text"
                         required
-                        placeholder="ej. mausugu"
+                        placeholder={generateClinicalUsername(fullName) || 'ej. sofrego'}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         className="w-full px-3 py-2 text-xs font-mono rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-white text-[#1e1b19]"
@@ -584,7 +590,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-[11px] font-bold text-[#1e1b19]">
-                        Contraseña *
+                        Contraseña Inicial *
                       </label>
                       <button
                         type="button"
@@ -597,7 +603,7 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="••••••••"
+                      placeholder="123456"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-3 py-2 text-xs font-mono rounded-lg border border-[#d8d1cd] focus:ring-2 focus:ring-[#005c55] bg-white text-[#1e1b19]"
@@ -638,11 +644,16 @@ export const ProfessionalsConfigScreen: React.FC<ProfessionalsConfigScreenProps>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 p-2 bg-[#005c55]/5 border border-[#005c55]/15 rounded-lg text-[11px] text-[#005c55]">
-                  <span className="material-symbols-outlined text-base shrink-0">rule</span>
-                  <span>
-                    <strong>Regla de Usuario (3+2+2):</strong> Se construye automáticamente con las <strong>3 primeras letras del nombre</strong> + las <strong>2 primeras del 1er apellido</strong> + las <strong>2 primeras del 2do apellido</strong> (ej. <em>Mauricio Suaza Gutiérrez → mausugu</em>).
-                  </span>
+                <div className="flex items-start gap-2 p-2.5 bg-[#005c55]/5 border border-[#005c55]/15 rounded-lg text-[11px] text-[#005c55]">
+                  <span className="material-symbols-outlined text-base shrink-0 mt-0.5">security_update_warning</span>
+                  <div>
+                    <p className="font-semibold">
+                      Regla de Usuario (3+2+2): 3 letras del nombre + 2 del 1er apellido + 2 del 2do apellido.
+                    </p>
+                    <p className="text-[10px] text-[#005c55]/80 mt-0.5">
+                      Contraseña inicial: <strong>123456</strong>. Al iniciar sesión por primera vez, el sistema solicitará obligatoriamente crear una contraseña definitiva de al menos 8 caracteres con mayúsculas, números y símbolos.
+                    </p>
+                  </div>
                 </div>
               </div>
 

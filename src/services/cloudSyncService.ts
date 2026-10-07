@@ -5,6 +5,7 @@
 
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { PatientProfile, MedicalProfessional, PatientEvolution } from '../types';
+import { generateClinicalUsername } from '../utils/authUtils';
 
 export async function fetchProfessionalsFromCloud(): Promise<MedicalProfessional[] | null> {
   if (!isSupabaseConfigured || !supabase) return null;
@@ -33,9 +34,10 @@ export async function fetchProfessionalsFromCloud(): Promise<MedicalProfessional
         signatureUrl: doc.signature_url,
         isPrimary: doc.is_primary,
         registeredAt: doc.registered_at,
-        username: doc.username || (doc.is_primary ? 'mausugu' : undefined),
-        password: doc.password || 'M77',
+        username: doc.username || generateClinicalUsername(doc.full_name) || (doc.is_primary ? 'mausugu' : 'usuario'),
+        password: doc.password || '123456',
         role: doc.role || (doc.is_primary ? 'superadmin' : 'doctor'),
+        mustChangePassword: doc.must_change_password ?? (doc.password === '123456' || doc.password === 'M77'),
       }));
     }
   } catch (e) {

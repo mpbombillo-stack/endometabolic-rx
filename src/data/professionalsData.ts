@@ -21,6 +21,7 @@ export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
     username: 'mausugu',
     password: 'M77',
     role: 'superadmin',
+    mustChangePassword: false,
   },
   {
     id: 'doc-2',
@@ -35,7 +36,8 @@ export const INITIAL_PROFESSIONALS: MedicalProfessional[] = [
     isPrimary: false,
     registeredAt: '2024-06-20',
     username: 'sofrego',
-    password: 'M77',
+    password: '123456',
     role: 'doctor',
+    mustChangePassword: true,
   },
 ];
