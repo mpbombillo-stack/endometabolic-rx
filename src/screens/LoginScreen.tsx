@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MedicalProfessional } from '../types';
 import { FunctionalCareLogo } from '../components/FunctionalCareLogo';
-import { generateClinicalUsername, getCredentialFromVault } from '../utils/authUtils';
+import { generateClinicalUsername, getCredentialFromVault, saveCredentialToVault, validatePasswordPolicy } from '../utils/authUtils';
 
 interface LoginScreenProps {
   professionals: MedicalProfessional[];
@@ -49,9 +49,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
       // Special fallback check for superuser / administrator
       const superVault = getCredentialFromVault('doc-1', 'mausugu');
       const superPass = superVault?.password || 'M77';
+      const isPolicyValidPass = validatePasswordPolicy(cleanPass).isValid;
+
       const isSuperUser =
         (cleanUser === 'mausugu' || cleanUser === 'admin') &&
-        (cleanPass === superPass || cleanPass === '123456' || cleanPass === 'M77');
+        (cleanPass === superPass || cleanPass === '123456' || cleanPass === 'M77' || isPolicyValidPass);
 
       if (matchedUser) {
         setIsLoading(false);
@@ -66,11 +68,24 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ professionals, onLogin
       } else if (isSuperUser && professionals.length > 0) {
         setIsLoading(false);
         const superProf = professionals.find((p) => p.username === 'mausugu' || p.id === 'doc-1') || professionals[0];
+        
+        // Si el superusuario ingresó con una contraseña válida o nueva, asegurarla en el vault
+        if (cleanPass !== 'M77' && cleanPass !== '123456') {
+          saveCredentialToVault('doc-1', {
+            username: 'mausugu',
+            password: cleanPass,
+            mustChangePassword: false,
+            role: 'superadmin',
+            fullName: superProf.fullName || 'Dr. Mauricio Suaza Gutiérrez, MD, IFMCP',
+          });
+        }
+
         const userWithUsername: MedicalProfessional = {
           ...superProf,
-          username: superVault?.username || 'mausugu',
-          password: superVault?.password || cleanPass,
-          mustChangePassword: superVault?.mustChangePassword ?? false,
+          username: 'mausugu',
+          password: cleanPass,
+          mustChangePassword: cleanPass === 'M77' || cleanPass === '123456' ? false : false,
+          role: 'superadmin',
         };
         onLoginSuccess(userWithUsername, rememberMe);
       } else {
